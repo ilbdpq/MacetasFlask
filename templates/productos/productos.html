@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Practico</title>
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+</head>
+
+<body>
+    {% include 'header.html' %}
+    {% include 'aside.html' %}
+    {% include 'footer.html' %}
+
+    <main>
+        <div id="productos">
+            {% if productos %}
+                <datalist id="productosTipos">
+                    {% for tipo in productosTipos %}
+                        <option value="{{tipo[0]}}">
+                    {% endfor %}
+                </datalist>
+                
+                <table id="tabla">
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Modelo</th>
+                        <th>Medidas</th>
+                    </tr>
+                {% for producto in productos %}
+                    <tr>
+                        <td><form action="/productos/seleccionar" method="post"><input type="submit" value="{{producto[0]}}" name="id_seleccionar"></form></td>
+                        <td>{{producto[1]}}</td>
+                        <td>{{producto[2]}}</td>
+                        <td>{{producto[3]}}</td>
+                        <td>{{producto[4]}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            
+            {% else %}
+                <p>No hay productos</p>
+            
+            {% endif %}
+
+            <form action="/productos/agregar" method="post" id="productosAgregar">
+                <label for="tipo_agregar">Tipo:</label>
+                <input type="text" id="tipo_agregar" name="tipo_agregar" list="productosTipos" required>
+
+                <label for="nombre_agregar">Nombre:</label>
+                <input type="text" id="nombre_agregar" name="nombre_agregar" required>
+
+                <label for="modelo_agregar">Modelo:</label>
+                <input type="text" id="modelo_agregar" name="modelo_agregar" required>
+
+                <label for="medidas_agregar">Medidas (cm):</label>
+                <input type="text" id="medidas_agregar" name="medidas_agregar" required>
+                
+                {% if mensaje_agregar %}
+                    <p>{{ mensaje_agregar }}</p>
+                {% else %}
+                    <p>&nbsp;</p>
+                {% endif %}
+
+                <input type="submit" value="Agregar Producto">
+            </form>
+
+            <form action="/productos/modificar" method="post" id="productosModificar">
+                {% if seleccionado %}
+                    <script>
+                        document.getElementById('productosModificar').scrollIntoView();
+                    </script>
+
+                    <label for="id_modificar">ID del Producto a Modificar:</label>
+                    <input type="number" id="id_modificar" name="id_modificar" value="{{seleccionado[0]}}" list="productosTipos" required readonly>
+
+                    <label for="tipo_modificar">Tipo:</label>
+                    <input type="text" id="tipo_modificar" name="tipo_modificar" value="{{seleccionado[1]}}" required>
+
+                    <label for="nombre_modificar">Nombre:</label>
+                    <input type="text" id="nombre_modificar" name="nombre_modificar" value="{{seleccionado[2]}}" required>
+
+                    <label for="modelo_modificar">Modelo:</label>
+                    <input type="text" id="modelo_modificar" name="modelo_modificar" value="{{seleccionado[3]}}" required>
+
+                    <label for="medidas_modificar">Medidas (cm):</label>
+                    <input type="text" id="medidas_modificar" name="medidas_modificar" value="{{seleccionado[4]}}" required>
+                {% else %}
+                    <label for="id_modificar">ID del Producto a Modificar:</label>
+                    <input type="number" id="id_modificar" name="id_modificar" required disabled>
+
+                    <label for="tipo_modificar">Tipo:</label>
+                    <input type="text" id="tipo_modificar" name="tipo_modificar" list="productosTipos" required>
+
+                    <label for="nombre_modificar">Nombre:</label>
+                    <input type="text" id="nombre_modificar" name="nombre_modificar" required>
+
+                    <label for="modelo_modificar">Modelo:</label>
+                    <input type="text" id="modelo_modificar" name="modelo_modificar" required>
+
+                    <label for="medidas_modificar">Medidas (cm):</label>
+                    <input type="text" id="medidas_modificar" name="medidas_modificar" required>
+                {% endif %}
+                
+                {% if mensaje_modificar %}
+                    <script>
+                        document.getElementById('productosModificar').scrollIntoView();
+                    </script>
+                    <p>{{ mensaje_modificar }}</p>
+                {% else %}
+                    <p>&nbsp;</p>
+                {% endif %}
+
+                <div id="productosModificarBotones">
+                    <input type="submit" value="Modificar Producto">
+                    <input type="submit" value="Eliminar Producto" formaction="/productos/eliminar">
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>

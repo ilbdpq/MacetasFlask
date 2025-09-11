@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+html {
+    background: #EEE;
+    --header: #777;
+    --footer: #777;
+    --main-a: #F00;
+    --main-b: #F77;
+    --main-c: #F99;
+}
+
+body {
+    display: grid;
+    grid-template-areas: 
+    'header header'
+    'aside main'
+    'footer footer';
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 6rem 1fr 6rem;
+    row-gap: 1rem;
+    column-gap: 1rem;
+}
+
+header {
+    grid-area: header;
+    background: var(--header);
+    box-shadow: 0 0.5rem 0.5rem 0 black;
+}
+
+footer {
+    grid-area: footer;
+    background: var(--footer);
+}
+
+main {
+    grid-area: main;
+    background: var(--main-a);
+    display: flex;
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+#productos {
+    padding: 1rem;
+    background: var(--main-a);
+    display: grid;
+    width: 100%;
+    grid-template-areas:
+    'tabla tabla'
+    'agregar modificar';
+    border-radius: 0.5rem 0 0 0.5rem;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+}
+    #productos #tabla {
+        grid-area: tabla;
+        height: fit-content;
+        padding: 1rem;
+        background: var(--main-b);
+        border-radius: 0.5rem;
+        border-spacing: 0;
+    }
+        #productos #tabla * {
+            font-family: monospace;
+            font-size: 12pt;
+        }
+        #productos #tabla tr:nth-child(odd) {
+            background: var(--main-c);
+        }
+        #productos #tabla tr td:nth-child(2) {
+            text-align: center;
+        }
+        #productos #tabla input {
+            width: 100%;
+            background: none;
+            border: 2px solid var(--main-c);
+            cursor: pointer;
+        }
+        #productos #tabla tr:nth-child(odd) input {
+            border: 2px solid var(--main-b);
+        }
+    #productos #productosAgregar {
+        display: flex;
+        height: fit-content;
+        flex-direction: column;
+        background: #F77;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        grid-area: agregar;
+    }
+        #productos #productosAgregar input:not([type=submit]) {
+            margin-bottom: 1rem;
+        }
+        #productos #productosAgregar input[type=submit] {
+            width: 50%;
+            align-self: center;
+            margin-top: 1rem;
+        }
+    #productos #productosModificar {
+        display: flex;
+        height: fit-content;
+        flex-direction: column;
+        background: #F77;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        grid-area: modificar;
+    }
+        #productos #productosModificar input:not([type=submit]) {
+            margin-bottom: 1rem;
+        }
+        #productos #productosModificar input[type=submit] {
+            width: 50%;
+            align-self: center;
+            margin-top: 1rem;
+        }
+        #productosModificarBotones {
+            display: flex;
+            flex-direction: row;
+        }
+
+aside {
+    grid-area: aside;
+    background: #0F0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    overflow: hidden;
+}
+    aside ul {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        padding: 0;
+    }
+    aside ul li:nth-child(odd) {
+        background: #7F7;
+    }
+    aside ul li a {
+        display: flex;
+        text-decoration: none;
+        height: 100%;
+        width: 100%;
+        padding: 0.5rem;
+    }
+    aside ul li:hover {
+        display: flex;
+        text-decoration: none;
+        height: 100%;
+        width: 100%;
+        background: #AFA;
+    }
