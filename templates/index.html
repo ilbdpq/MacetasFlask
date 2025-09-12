@@ -5,6 +5,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Practico</title>
     <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
 </head>
 
 <body>
@@ -12,9 +13,21 @@
     {% include 'aside.html' %}
     {% include 'footer.html' %}
 
-    <main>
-        main
-    </main>
+    <div class="window" id="main-window">
+        <div class="title-bar">
+            <div class="title-bar-text">Main</div>
+        </div>
+
+        <div class="window-body">
+            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vero unde recusandae facilis, ea cupiditate, perferendis repellat dolorem, delectus debitis doloribus nemo in amet placeat ullam dolorum dolor ex ut aperiam.</p>
+        
+            <div class="status-bar">
+                <p class="status-bar-field">Press F1 for help</p>
+                <p class="status-bar-field">Slide 1</p>
+                <p class="status-bar-field">CPU Usage: 14%</p>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
