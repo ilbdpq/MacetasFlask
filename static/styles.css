@@ -81,46 +81,6 @@ main {
         #productos #tabla tr:nth-child(odd) input {
             border: 2px solid var(--main-b);
         }
-    #productos #productosAgregar {
-        display: flex;
-        height: fit-content;
-        flex-direction: column;
-        background: #F77;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-top: 1rem;
-        grid-area: agregar;
-    }
-        #productos #productosAgregar input:not([type=submit]) {
-            margin-bottom: 1rem;
-        }
-        #productos #productosAgregar input[type=submit] {
-            width: 50%;
-            align-self: center;
-            margin-top: 1rem;
-        }
-    #productos #productosModificar {
-        display: flex;
-        height: fit-content;
-        flex-direction: column;
-        background: #F77;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-top: 1rem;
-        grid-area: modificar;
-    }
-        #productos #productosModificar input:not([type=submit]) {
-            margin-bottom: 1rem;
-        }
-        #productos #productosModificar input[type=submit] {
-            width: 50%;
-            align-self: center;
-            margin-top: 1rem;
-        }
-        #productosModificarBotones {
-            display: flex;
-            flex-direction: row;
-        }
 
 aside {
     grid-area: aside;
