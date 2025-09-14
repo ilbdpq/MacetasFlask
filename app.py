@@ -41,10 +41,16 @@ def Inyectar_Productos():
         productosTipos = Productos.Consultar_Tipos()
     )
 
+'''
+Página principal
+'''
 @APP.route('/')
 def Index():
     return render_template('index.html')
 
+'''
+Productos
+'''
 @APP.route('/productos/', methods=['GET'])
 def Productos_Consultar():
     return render_template('/productos.html')
@@ -59,16 +65,9 @@ def Productos_Agregar():
 
         Productos = fun.Productos(Get_DB())
 
-        return render_template('/productos.html', mensaje_agregar=Productos.Agregar(tipo, nombre, modelo, medidas))
+        return render_template('/productos.html', mensaje=Productos.Agregar(tipo, nombre, modelo, medidas))
 
     return render_template('/productos.html')
-
-@APP.route('/productos/seleccionar', methods=['POST'])
-def Productos_Seleccionar():
-    id = request.form['id_seleccionar']
-    Productos = fun.Productos(Get_DB())
-
-    return render_template('/productos.html', seleccionado=Productos.Seleccionar(id))
 
 @APP.route('/productos/modificar', methods=['POST'])
 def Productos_Modificar():
@@ -80,16 +79,19 @@ def Productos_Modificar():
 
     Productos = fun.Productos(Get_DB())
 
-    return render_template('/productos.html', mensaje_modificar=Productos.Modificar(id, tipo, nombre, modelo, medidas))
+    return render_template('/productos.html', mensaje=Productos.Modificar(id, tipo, nombre, modelo, medidas))
 
 @APP.route('/productos/eliminar', methods=['POST'])
 def Productos_Eliminar():
-    id = request.form['id_modificar']
-    DB = Get_DB()
-    DB.execute('UPDATE productos SET habilitado = 0 WHERE id = ?', (id,))
-    DB.commit()
+    id = request.form['id_eliminar']
+    
+    Productos = fun.Productos(Get_DB())
 
-    return render_template('/productos.html', mensaje_modificar='Producto eliminado exitosamente.', productos=fun.Productos_Tabla(Get_DB()))
+    return render_template('/productos.html', mensaje=Productos.Eliminar(id))
+
+'''
+Componentes
+'''
 
 with APP.app_context():
     Init_DB()

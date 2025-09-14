@@ -4,8 +4,8 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Practico</title>
-    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
     <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
 </head>
 
 <body>
@@ -16,56 +16,64 @@
             <div id="aside">
                 {% include 'nav.html' %}
     
-                <div class="field-border-disabled" id="explicacion">
-                    Explicaciones?
-                </div>
+                {% if not productosLista %}
+                    <div class="field-border-disabled" id="mensaje">
+                        No hay productos
+                    </div>
+                {% elif mensaje %}
+                    <div class="field-border-disabled" id="mensaje">
+                        {{mensaje}}
+                    </div>
+                {% endif %}
             </div>
 
             <div id="main">
-                <div class="sunken-panel">
-                    <table class="interactive">
-                        <thead>
-                            <th class="primerColumna">ID</th>
-                            <th>Tipo</th>
-                            <th>Nombre</th>
-                            <th>Modelo</th>
-                            <th>Medidas</th>
-                            <th class="ultimaColumna">Acción</th>
-                        </thead>
+                {% if productosLista %}
+                    <div class="sunken-panel">
+                        <table class="interactive">
+                            <thead>
+                                <th class="primerColumna">ID</th>
+                                <th>Tipo</th>
+                                <th>Nombre</th>
+                                <th>Modelo</th>
+                                <th>Medidas</th>
+                                <th class="ultimaColumna">Acción</th>
+                            </thead>
 
-                        {% for producto in productosLista %}
-                            <tr>
-                                <form action="/productos/modificar" method="post">
-                                    <td class="primerColumna">
-                                        <input type="text" name="id_modificar" value="{{producto[0]}}" readonly required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="tipo_modificar" value="{{producto[1]}}" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="nombre_modificar" value="{{producto[2]}}" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="modelo_modificar" value="{{producto[3]}}" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="medidas_modificar" value="{{producto[4]}}" required>
-                                    </td>
-                                    <td class="ultimaColumna">
-                                        <div>
-                                            <input type="submit" value="Guardar">
-    
-                                            <form action="/productos/eliminar" method="post">
-                                                <input type="hidden" name="id_eliminar" value="{{producto[0]}}">
-                                                <input type="submit" value="Eliminar">
-                                            </form>
-                                        </div>
-                                    </td>
-                                </form>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+                            {% for producto in productosLista %}
+                                <tr>
+                                    <form action="/productos/modificar" method="post">
+                                        <td class="primerColumna">
+                                            <input type="text" name="id_modificar" value="{{producto[0]}}" readonly required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="tipo_modificar" value="{{producto[1]}}" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="nombre_modificar" value="{{producto[2]}}" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="modelo_modificar" value="{{producto[3]}}" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="medidas_modificar" value="{{producto[4]}}" required>
+                                        </td>
+                                        <td class="ultimaColumna">
+                                            <div>
+                                                <input type="submit" value="Guardar">
+        
+                                                <form method="post">
+                                                    <input type="hidden" name="id_eliminar" value="{{producto[0]}}">
+                                                    <input type="submit" formaction="/productos/eliminar" value="Eliminar">
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
                 <!-- {% if productosLista %}
                     <datalist id="productosTipos">
                         {% for tipo in productosTipos %}

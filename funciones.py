@@ -48,3 +48,9 @@ class Productos:
         self.DB.commit()
         
         return Mensajes['PRODUCTO_MODIFICAR_EXITO']
+    
+    def Eliminar(self, id):
+        self.DB.execute('UPDATE productos SET habilitado = 0 WHERE id = ?', (id,))
+        self.DB.commit()
+        
+        return Mensajes['PRODUCTO_ELIMINAR_EXITO']
