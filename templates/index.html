@@ -4,8 +4,8 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Practico</title>
-    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
     <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
 </head>
 
 <body>
@@ -16,9 +16,11 @@
             <div id="aside">
                 {% include 'nav.html' %}
     
-                <div class="field-border-disabled" id="explicacion">
-                    Explicaciones?
-                </div>
+                {% if mensaje %}
+                    <div class="field-border-disabled" id="mensaje">
+                        {{mensaje}}
+                    </div>
+                {% endif %}
             </div>
             
             <div id="main">
