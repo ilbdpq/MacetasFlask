@@ -97,4 +97,5 @@ with APP.app_context():
     Init_DB()
 
 if __name__ == '__main__':
-    APP.run(debug=True)
+    APP.config['SECRET_KEY'] = 'bdpq'
+    APP.run(debug=True, host='0.0.0.0')
