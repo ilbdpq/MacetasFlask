@@ -119,10 +119,6 @@ def Componentes_Agregar():
 
 with APP.app_context():
     Init_DB()
-    Productos = fun.Productos(Get_DB())
-    Componentes = fun.Componentes(Get_DB())
-    print(Productos.Consultar_Formateado())
-    print('Componentes', Componentes.Consultar())
 
 if __name__ == '__main__':
     APP.config['SECRET_KEY'] = 'bdpq'
