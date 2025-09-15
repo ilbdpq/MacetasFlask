@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Practico</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+</head>
+
+<body>
+    <div class="window">
+        {% include 'header.html' %}
+
+        <div class="window-body" id="container">
+            <div id="aside">
+                {% include 'nav.html' %}
+
+                {% if not componentesLista %}
+                    {% if not productosLista %}
+                    <div class="field-border-disabled" id="mensaje">
+                        No hay productos
+                    </div>
+                    {% endif %}
+                    <div class="field-border-disabled" id="mensaje">
+                        No hay componentes
+                    </div>
+                {% elif mensaje %}
+                    <div class="field-border-disabled" id="mensaje">
+                        {{mensaje}}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="main">
+                <div class="sunken-panel">
+                    <table class="interactive">
+                        <thead>
+                            <th class="primerColumna">ID</th>
+                            <th>Producto</th>
+                            <th>Nombre</th>
+                            <th>Medidas</th>
+                            <th>Cantidad</th>
+                            <th class="ultimaColumna">Acción</th>
+                        </thead>
+                        {% if componentesLista %}
+                        {% for componente in componentesLista %}
+                        <tr>
+                            <form action="/componentes/modificar" method="post">
+                                <td class="primerColumna">
+                                    <input type="text" name="id_modificar" value="{{componente[0]}}" readonly required>
+                                </td>
+                                <td>
+                                    <input type="text" name="producto_modificar" value="{{productosFormateados[componente[1]]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="nombre_modificar" value="{{componente[2]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="medidas_modificar" value="{{componente[3]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="cantidad_modificar" value="{{componente[4]}}" required>
+                                </td>
+                                <td class="ultimaColumna">
+                                    <div>
+                                        <input type="submit" value="Guardar">
+
+                                        <form method="post">
+                                            <input type="hidden" name="id_eliminar" value="{{componente[0]}}">
+                                            <input type="submit" formaction="/componentes/eliminar" value="Eliminar">
+                                        </form>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                        <tr>
+                            <form action="/componentes/agregar" method="post">
+                                <td class="primerColumna">
+                                    <input type="text" name="id_modificar" value="{{componenteSiguiente}}" readonly required>
+                                </td>
+                                <td>
+                                    <select name="producto_agregar" id="producto_agregar">
+                                        {% for producto in productosFormateados %}
+                                        <option value="{{producto}}">{{producto}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="nombre_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="medidas_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="cantidad_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="submit" value="Agregar">
+                                </td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

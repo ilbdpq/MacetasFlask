@@ -69,6 +69,10 @@ class Productos:
             return 1
         
         return resultado + 1
+
+    def Consultar_Formateado(self):
+        self.DB.row_factory = lambda cursor, row: f"{row[3]} ({row[1]} {row[2]}) ID#{row[0]}"
+        return self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
     
     def Seleccionar(self, id):
         return self.DB.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()
@@ -120,6 +124,7 @@ class Componentes:
         self.DB = DB
 
     def Consultar(self):
+        self.DB.row_factory = lambda cursor, row: row
         return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
 
     def Consultar_Siguiente_ID(self):
@@ -134,7 +139,7 @@ class Componentes:
     def Seleccionar(self, id):
         return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
 
-    def Agregar(self, id_producto, nombre, medidas, cantidad):
+    def Agregar(self, producto, nombre, medidas, cantidad):
         if not Validar_Texto(nombre):
             return Mensajes['COMPONENTE_ERROR_NOMBRE']
         
@@ -143,11 +148,15 @@ class Componentes:
         
         if not Validar_Cantidad(cantidad):
             return Mensajes['COMPONENTE_ERROR_CANTIDAD']
+
+        # Reformatear producto
+        id_producto = int(producto.split('ID#')[-1])
         
         self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
         self.DB.commit()
         
-        return Mensajes['COMPONENTE_EXITO_AGREGAR']
+        # return Mensajes['COMPONENTE_EXITO_AGREGAR']
+        return int(producto.split('ID#')[-1])
 
     def Modificar(self, id, id_producto, nombre, medidas, cantidad):
         if not Validar_Texto(nombre):

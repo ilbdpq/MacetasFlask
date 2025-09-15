@@ -34,12 +34,18 @@ def Init_DB():
 
 @APP.context_processor
 def Inyectar_Productos():
-    Productos = fun.Productos(Get_DB())
+    DB = Get_DB()
+    Productos = fun.Productos(DB)
+    Componentes = fun.Componentes(DB)
     
     return dict(
         productosLista = Productos.Consultar(),
         productosTipos = Productos.Consultar_Tipos(),
-        productoSiguiente = Productos.Consultar_Siguiente_ID()
+        productoSiguiente = Productos.Consultar_Siguiente_ID(),
+        productosFormateados = Productos.Consultar_Formateado(),
+
+        componentesLista = Componentes.Consultar(),
+        componenteSiguiente = Componentes.Consultar_Siguiente_ID()
     )
 
 '''
@@ -93,9 +99,30 @@ def Productos_Eliminar():
 '''
 Componentes
 '''
+@APP.route('/componentes/', methods=['GET'])
+def Componentes_Consultar():
+    return render_template('/componentes.html')
+
+@APP.route('/componentes/agregar', methods=['POST'])
+def Componentes_Agregar():
+    if request.method == 'POST':
+        producto = request.form['producto_agregar']
+        nombre = request.form['nombre_agregar']
+        medidas = request.form['medidas_agregar']
+        cantidad = request.form['cantidad_agregar']
+
+        Componentes = fun.Componentes(Get_DB())
+
+        return render_template('/componentes.html', mensaje=Componentes.Agregar(producto, nombre, medidas, cantidad))
+
+    return render_template('/componentes.html')
 
 with APP.app_context():
     Init_DB()
+    Productos = fun.Productos(Get_DB())
+    Componentes = fun.Componentes(Get_DB())
+    print(Productos.Consultar_Formateado())
+    print('Componentes', Componentes.Consultar())
 
 if __name__ == '__main__':
     APP.config['SECRET_KEY'] = 'bdpq'
