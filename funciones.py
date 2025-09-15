@@ -115,50 +115,50 @@ class Productos:
         
         return Mensajes['PRODUCTO_EXITO_ELIMINAR']
     
-    class Componentes:
-        def __init__(self, DB):
-            self.DB = DB
+class Componentes:
+    def __init__(self, DB):
+        self.DB = DB
 
-        def Consultar(self):
-            return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
+    def Consultar(self):
+        return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
 
-        def Consultar_Siguiente_ID(self):
-            self.DB.row_factory = lambda cursor, row: row[0]
-            resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "componentes"').fetchone()
-            
-            if resultado is None:
-                return 1
-            
-            return resultado + 1
+    def Consultar_Siguiente_ID(self):
+        self.DB.row_factory = lambda cursor, row: row[0]
+        resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "componentes"').fetchone()
+        
+        if resultado is None:
+            return 1
+        
+        return resultado + 1
 
-        def Seleccionar(self, id):
-            return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
+    def Seleccionar(self, id):
+        return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
 
-        def Agregar(self, id_producto, nombre, medidas, cantidad):
-            if not Validar_Texto(nombre):
-                return Mensajes['COMPONENTE_ERROR_NOMBRE']
-            
-            if not Validar_Medidas(medidas):
-                return Mensajes['COMPONENTE_ERROR_MEDIDAS']
-            
-            if not Validar_Cantidad(cantidad):
-                return Mensajes['COMPONENTE_ERROR_CANTIDAD']
-            
-            self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
-            self.DB.commit()
-            
-            return Mensajes['COMPONENTE_EXITO_AGREGAR']
+    def Agregar(self, id_producto, nombre, medidas, cantidad):
+        if not Validar_Texto(nombre):
+            return Mensajes['COMPONENTE_ERROR_NOMBRE']
+        
+        if not Validar_Medidas(medidas):
+            return Mensajes['COMPONENTE_ERROR_MEDIDAS']
+        
+        if not Validar_Cantidad(cantidad):
+            return Mensajes['COMPONENTE_ERROR_CANTIDAD']
+        
+        self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
+        self.DB.commit()
+        
+        return Mensajes['COMPONENTE_EXITO_AGREGAR']
 
-        def Modificar(self, id, id_producto, nombre, medidas, cantidad):
-            if not Validar_Texto(nombre):
-                return 'Error: El nombre solo puede contener letras, números, espacios y guiones.'
-            
-            self.DB.execute('UPDATE componentes SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
-            self.DB.commit()
-            
-            return Mensajes['COMPONENTE_EXITO_MODIFICAR']
+    def Modificar(self, id, id_producto, nombre, medidas, cantidad):
+        if not Validar_Texto(nombre):
+            return 'Error: El nombre solo puede contener letras, números, espacios y guiones.'
+        
+        self.DB.execute('UPDATE componentes SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
+        self.DB.commit()
+        
+        return Mensajes['COMPONENTE_EXITO_MODIFICAR']
 
-        def Eliminar(self, id):
-            self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
-            self.DB.commit()
-            return Mensajes['COMPONENTE_EXITO_ELIMINAR']
+    def Eliminar(self, id):
+        self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
+        self.DB.commit()
+        return Mensajes['COMPONENTE_EXITO_ELIMINAR']
