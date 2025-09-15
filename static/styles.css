@@ -43,6 +43,10 @@ html {
     row-gap: 1rem;
 }
 
+ul.tree-view#nav {
+    padding: 0.5rem;
+}
+
 @keyframes mensaje-flash {
     from {background: white;}
     to {background: inherit;}
@@ -76,9 +80,6 @@ table.interactive {
         width: 6rem;
         text-align: center;
     }
-    table.interactive tr:nth-child(even) input:read-write {
-        background: #EEE;
-    }
     table.interactive .primerColumna input {
         text-align: center;
     }
@@ -92,6 +93,13 @@ table.interactive {
     table.interactive input {
         width: 100%;
         height: 2rem;
+    }
+    table.interactive tr:nth-child(even) input:read-write {
+        background: #EEE;
+    }
+    table.interactive tr input:read-write:focus {
+        background: navy;
+        color: white;
     }
     table.interactive select {
         width: 100%;

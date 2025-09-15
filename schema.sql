@@ -85,6 +85,6 @@ INSERT INTO productos (tipo, nombre, modelo, medidas) VALUES
 ('Maceta', 'Colgante', 'M-015', '15x15x30'),
 ('Maceta', 'Doble', 'M-016', '25x25x25'),
 ('Maceta', 'Triple', 'M-017', '30x30x20'),
-('Macetón', 'Cuadrada Grande', 'M-018', '40x40x40'),
-('Macetón', 'Redonda Grande', 'M-019', '35x35x35'),
+('Macetón', 'Cuadrado Grande', 'ML-018', '40x40x40'),
+('Macetón', 'Redondo Grande', 'ML-019', '35x35x35'),
 ('Maceta', 'Ovalada', 'M-020', '30x20x15');

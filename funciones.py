@@ -39,7 +39,16 @@ class Productos:
     
     def Consultar_Tipos(self):
         self.DB.row_factory = lambda cursor, row: row[0]
-        return self.DB.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0').fetchall()
+        return self.DB.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()
+    
+    def Consultar_Siguiente_ID(self):
+        self.DB.row_factory = lambda cursor, row: row[0]
+        resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "productos"').fetchone()
+        
+        if resultado is None:
+            return 1
+        
+        return resultado + 1
     
     def Seleccionar(self, id):
         return self.DB.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()

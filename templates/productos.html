@@ -28,79 +28,78 @@
             </div>
 
             <div id="main">
-                {% if productosLista %}
-                    <div class="sunken-panel">
-                        <table class="interactive">
-                            <thead>
-                                <th class="primerColumna">ID</th>
-                                <th>Tipo</th>
-                                <th>Nombre</th>
-                                <th>Modelo</th>
-                                <th>Medidas</th>
-                                <th class="ultimaColumna">Acción</th>
-                            </thead>
+                <div class="sunken-panel">
+                    <table class="interactive">
+                        <thead>
+                            <th class="primerColumna">ID</th>
+                            <th>Tipo</th>
+                            <th>Nombre</th>
+                            <th>Modelo</th>
+                            <th>Medidas</th>
+                            <th class="ultimaColumna">Acción</th>
+                        </thead>
+                        {% if productosLista %}
+                        {% for producto in productosLista %}
+                        <tr>
+                            <form action="/productos/modificar" method="post">
+                                <td class="primerColumna">
+                                    <input type="text" name="id_modificar" value="{{producto[0]}}" readonly required>
+                                </td>
+                                <td>
+                                    <input type="text" name="tipo_modificar" value="{{producto[1]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="nombre_modificar" value="{{producto[2]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="modelo_modificar" value="{{producto[3]}}" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="medidas_modificar" value="{{producto[4]}}" required>
+                                </td>
+                                <td class="ultimaColumna">
+                                    <div>
+                                        <input type="submit" value="Guardar">
 
-                            {% for producto in productosLista %}
-                                <tr>
-                                    <form action="/productos/modificar" method="post">
-                                        <td class="primerColumna">
-                                            <input type="text" name="id_modificar" value="{{producto[0]}}" readonly required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="tipo_modificar" value="{{producto[1]}}" required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="nombre_modificar" value="{{producto[2]}}" required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="modelo_modificar" value="{{producto[3]}}" required>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="medidas_modificar" value="{{producto[4]}}" required>
-                                        </td>
-                                        <td class="ultimaColumna">
-                                            <div>
-                                                <input type="submit" value="Guardar">
-        
-                                                <form method="post">
-                                                    <input type="hidden" name="id_eliminar" value="{{producto[0]}}">
-                                                    <input type="submit" formaction="/productos/eliminar" value="Eliminar">
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                            {% endfor %}
-                            <tr>
-                                <form action="/productos/agregar" method="post">
-                                    <td class="primerColumna">
-                                        <input type="text" name="id_modificar" value="+" readonly required>
-                                    </td>
-                                    <td>
-                                        <select name="tipo_agregar" id="tipo_agregar">
-                                            {% for tipo in productosTipos %}
-                                            <option value="{{tipo}}">{{tipo}}</option>
-                                            {% endfor %}
-                                            <option value="otro">Otro</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="nombre_agregar" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="modelo_agregar" required>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="medidas_agregar" required>
-                                    </td>
-                                    <td colspan="2">
-                                        <input type="submit" value="Agregar">
-                                    </td>
-                                </form>
-                            </tr>
-                        </table>
-                    </div>
-                {% endif %}
+                                        <form method="post">
+                                            <input type="hidden" name="id_eliminar" value="{{producto[0]}}">
+                                            <input type="submit" formaction="/productos/eliminar" value="Eliminar">
+                                        </form>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                        <tr>
+                            <form action="/productos/agregar" method="post">
+                                <td class="primerColumna">
+                                    <input type="text" name="id_modificar" value="{{productoSiguiente}}" readonly required>
+                                </td>
+                                <td>
+                                    <select name="tipo_agregar" id="tipo_agregar">
+                                        {% for tipo in productosTipos %}
+                                        <option value="{{tipo}}">{{tipo}}</option>
+                                        {% endfor %}
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="nombre_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="modelo_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="medidas_agregar" required>
+                                </td>
+                                <td>
+                                    <input type="submit" value="Agregar">
+                                </td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

@@ -38,7 +38,8 @@ def Inyectar_Productos():
     
     return dict(
         productosLista = Productos.Consultar(),
-        productosTipos = Productos.Consultar_Tipos()
+        productosTipos = Productos.Consultar_Tipos(),
+        productoSiguiente = Productos.Consultar_Siguiente_ID()
     )
 
 '''
