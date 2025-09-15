@@ -2,14 +2,22 @@ import re
 import sqlite3
 
 Mensajes = {
-    'PRODUCTO_EXITO_AGREGAR': 'Producto agregado exitosamente.',
-    'PRODUCTO_EXITO_MODIFICAR': 'Producto modificado exitosamente.',
-    'PRODUCTO_EXITO_ELIMINAR': 'Producto eliminado exitosamente.',
-    'PRODUCTO_ERROR_TIPO': 'Error: El tipo solo puede contener letras, números, espacios y guiones.',
-    'PRODUCTO_ERROR_NOMBRE': 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
-    'PRODCUTO_ERROR_MODELO': 'Error: El modelo solo puede contener letras, números, espacios y guiones.',
-    'PRODUCTO_ERROR_MEDIDAS': 'Error: Las medidas deben tener el formato AxBxC, donde A, B y C son números entre 1 y 4 dígitos.',
-    'PRODUCTO_ERROR_NOENCONTRADO': 'Error: Producto no encontrado.'
+    'PRODUCTO_EXITO_AGREGAR'        : 'Producto agregado exitosamente.',
+    'PRODUCTO_EXITO_MODIFICAR'      : 'Producto modificado exitosamente.',
+    'PRODUCTO_EXITO_ELIMINAR'       : 'Producto eliminado exitosamente.',
+    'PRODUCTO_ERROR_TIPO'           : 'Error: El tipo solo puede contener letras, números, espacios y guiones.',
+    'PRODUCTO_ERROR_NOMBRE'         : 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
+    'PRODCUTO_ERROR_MODELO'         : 'Error: El modelo solo puede contener letras, números, espacios y guiones.',
+    'PRODUCTO_ERROR_MEDIDAS'        : 'Error: Las medidas deben tener el formato AxBxC, donde A, B y C son números entre 1 y 4 dígitos.',
+    'PRODUCTO_ERROR_NOENCONTRADO'   : 'Error: Producto no encontrado.',
+    
+    'COMPONENTE_EXITO_AGREGAR'      : 'Componente agregado exitosamente.',
+    'COMPONENTE_EXITO_MODIFICAR'    : 'Componente modificado exitosamente.',
+    'COMPONENTE_EXITO_ELIMINAR'     : 'Componente eliminado exitosamente.',
+    'COMPONENTE_ERROR_NOMBRE'       : 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
+    'COMPONENTE_ERROR_MEDIDAS'      : 'Error: Las medidas deben tener el formato AxBxC, donde A, B y C son números entre 1 y 4 dígitos.',
+    'COMPONENTE_ERROR_CANTIDAD'     : 'Error: La cantidad debe ser un número entero positivo.',
+    'COMPONENTE_ERROR_NOENCONTRADO' : 'Error: Componente no encontrado.'
 }
 
 def Validar_Medidas(medidas):
@@ -29,6 +37,18 @@ def Validar_Texto(texto):
         return True
 
     return False
+
+def Validar_Cantidad(cantidad):
+    try:
+        valor = int(cantidad)
+        
+        if valor > 0:
+            return True
+        
+        return False
+    
+    except ValueError:
+        return False
 
 class Productos:
     def __init__(self, DB):
@@ -94,3 +114,51 @@ class Productos:
         self.DB.commit()
         
         return Mensajes['PRODUCTO_EXITO_ELIMINAR']
+    
+    class Componentes:
+        def __init__(self, DB):
+            self.DB = DB
+
+        def Consultar(self):
+            return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
+
+        def Consultar_Siguiente_ID(self):
+            self.DB.row_factory = lambda cursor, row: row[0]
+            resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "componentes"').fetchone()
+            
+            if resultado is None:
+                return 1
+            
+            return resultado + 1
+
+        def Seleccionar(self, id):
+            return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
+
+        def Agregar(self, id_producto, nombre, medidas, cantidad):
+            if not Validar_Texto(nombre):
+                return Mensajes['COMPONENTE_ERROR_NOMBRE']
+            
+            if not Validar_Medidas(medidas):
+                return Mensajes['COMPONENTE_ERROR_MEDIDAS']
+            
+            if not Validar_Cantidad(cantidad):
+                return Mensajes['COMPONENTE_ERROR_CANTIDAD']
+            
+            self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
+            self.DB.commit()
+            
+            return Mensajes['COMPONENTE_EXITO_AGREGAR']
+
+        def Modificar(self, id, id_producto, nombre, medidas, cantidad):
+            if not Validar_Texto(nombre):
+                return 'Error: El nombre solo puede contener letras, números, espacios y guiones.'
+            
+            self.DB.execute('UPDATE componentes SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
+            self.DB.commit()
+            
+            return Mensajes['COMPONENTE_EXITO_MODIFICAR']
+
+        def Eliminar(self, id):
+            self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
+            self.DB.commit()
+            return Mensajes['COMPONENTE_EXITO_ELIMINAR']

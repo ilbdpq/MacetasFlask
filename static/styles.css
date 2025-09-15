@@ -48,8 +48,17 @@ ul.tree-view#nav {
 }
 
 @keyframes mensaje-flash {
-    from {background: white;}
-    to {background: inherit;}
+    0% {
+        background: navy;
+        color: white;
+    }
+    50% {
+        background: white;
+        color: inherit;
+    }
+    100% {
+        background: inherit;
+    }
 }
 
 #mensaje {
