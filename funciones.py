@@ -50,6 +50,14 @@ def Validar_Cantidad(cantidad):
     except ValueError:
         return False
 
+def Formatear_Producto(producto):
+    # Extrae el número de ID entre paréntesis al final de la cadena, por ejemplo: "Maceta Redonda (10)" -> 10
+    match = re.search(r'\((\d+)\)$', producto.strip())
+    if match:
+        return int(match.group(1))
+
+    return None
+
 class Productos:
     def __init__(self, DB):
         self.DB = DB
@@ -58,21 +66,19 @@ class Productos:
         return self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
     
     def Consultar_Tipos(self):
-        self.DB.row_factory = lambda cursor, row: row[0]
-        return self.DB.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()
+        return self.DB.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()[0]
     
     def Consultar_Siguiente_ID(self):
-        self.DB.row_factory = lambda cursor, row: row[0]
-        resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "productos"').fetchone()
+        resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
         
         if resultado is None:
             return 1
         
-        return resultado + 1
+        return resultado
 
     def Consultar_Formateado(self):
-        self.DB.row_factory = lambda cursor, row: f"{row[3]} ({row[1]} {row[2]}) ID#{row[0]}"
-        return self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
+        resultado = self.DB.execute('SELECT tipo, nombre, id FROM productos WHERE habilitado != 0').fetchall()
+        return {fila[2] : f'{fila[0]} {fila[1]} ({fila[2]})' for fila in resultado}
     
     def Seleccionar(self, id):
         return self.DB.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()
@@ -124,17 +130,16 @@ class Componentes:
         self.DB = DB
 
     def Consultar(self):
-        self.DB.row_factory = lambda cursor, row: row
         return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
 
     def Consultar_Siguiente_ID(self):
-        self.DB.row_factory = lambda cursor, row: row[0]
-        resultado = self.DB.execute('SELECT seq FROM sqlite_sequence WHERE name = "componentes"').fetchone()
-        
-        if resultado is None:
+        try:
+            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes"').fetchone()[0]
+
+        except TypeError:
             return 1
         
-        return resultado + 1
+        return resultado
 
     def Seleccionar(self, id):
         return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
@@ -143,20 +148,21 @@ class Componentes:
         if not Validar_Texto(nombre):
             return Mensajes['COMPONENTE_ERROR_NOMBRE']
         
-        if not Validar_Medidas(medidas):
-            return Mensajes['COMPONENTE_ERROR_MEDIDAS']
+        # if not Validar_Medidas(medidas):
+        #     return Mensajes['COMPONENTE_ERROR_MEDIDAS']
         
         if not Validar_Cantidad(cantidad):
             return Mensajes['COMPONENTE_ERROR_CANTIDAD']
 
         # Reformatear producto
-        id_producto = int(producto.split('ID#')[-1])
+        id_producto = Formatear_Producto(producto)
+        if id_producto is None:
+            return Mensajes['COMPONENTE_ERROR_NOENCONTRADO']
         
         self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
         self.DB.commit()
         
-        # return Mensajes['COMPONENTE_EXITO_AGREGAR']
-        return int(producto.split('ID#')[-1])
+        return Mensajes['COMPONENTE_EXITO_AGREGAR']
 
     def Modificar(self, id, id_producto, nombre, medidas, cantidad):
         if not Validar_Texto(nombre):

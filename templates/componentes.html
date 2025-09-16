@@ -51,7 +51,7 @@
                                     <input type="text" name="id_modificar" value="{{componente[0]}}" readonly required>
                                 </td>
                                 <td>
-                                    <input type="text" name="producto_modificar" value="{{productosFormateados[componente[1]]}}" required>
+                                    <input type="text" name="producto_modificar" value="{{productosFormateados.get(componente[1])}}" required>
                                 </td>
                                 <td>
                                     <input type="text" name="nombre_modificar" value="{{componente[2]}}" required>
@@ -83,7 +83,7 @@
                                 </td>
                                 <td>
                                     <select name="producto_agregar" id="producto_agregar">
-                                        {% for producto in productosFormateados %}
+                                        {% for producto in productosFormateados.values() %}
                                         <option value="{{producto}}">{{producto}}</option>
                                         {% endfor %}
                                     </select>

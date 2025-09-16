@@ -117,9 +117,21 @@ def Componentes_Agregar():
 
     return render_template('/componentes.html')
 
+@APP.route('/componentes/modificar', methods=['POST'])
+def Componentes_Modificar():
+    id = request.form['id_modificar']
+    producto = request.form['producto_modificar']
+    nombre = request.form['nombre_modificar']
+    medidas = request.form['medidas_modificar']
+    cantidad = request.form['cantidad_modificar']
+
+    Componentes = fun.Componentes(Get_DB())
+
+    return render_template('/componentes.html', mensaje=Componentes.Modificar(id, producto, nombre, medidas, cantidad))
+
 with APP.app_context():
     Init_DB()
 
 if __name__ == '__main__':
     APP.config['SECRET_KEY'] = 'bdpq'
-    APP.run(debug=True, host='0.0.0.0')
+    APP.run(debug=True)

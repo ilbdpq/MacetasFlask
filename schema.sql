@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS componentes;
+DROP TABLE IF EXISTS componentes_por_producto;
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS fabricaciones_encabezado;
 DROP TABLE IF EXISTS fabricaciones_detalle;
@@ -19,9 +20,16 @@ CREATE TABLE productos (
 -- Tabla COMPONENTES
 CREATE TABLE componentes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_producto INTEGER NOT NULL,
     nombre TEXT NOT NULL,
     medidas TEXT NOT NULL,
+    habilitado INTEGER NOT NULL DEFAULT 1
+);
+
+-- Tabla COMPONENTES POR PRODUCTO
+CREATE TABLE componentes_por_producto (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_producto INTEGER NOT NULL,
+    id_componente NOT NULL,
     cantidad INTEGER NOT NULL,
     habilitado INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY(id_producto) REFERENCES productos(id)
@@ -88,25 +96,3 @@ INSERT INTO productos (tipo, nombre, modelo, medidas) VALUES
 ('Macetón', 'Cuadrado Grande', 'ML-018', '40x40x40'),
 ('Macetón', 'Redondo Grande', 'ML-019', '35x35x35'),
 ('Maceta', 'Ovalada', 'M-020', '30x20x15');
--- Insertar datos de ejemplo en COMPONENTES
-INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES
-(1, 'Base', '10x10', 100),
-(1, 'Pared', '10x10x10', 100),
-(2, 'Base', '15x15', 80),
-(2, 'Pared', '15x15x20', 80),
-(3, 'Base', '20x20', 60),
-(3, 'Pared', '20x20x20', 60),
-(4, 'Base', '12x12', 70),
-(4, 'Pared', '12x12x25', 70),
-(5, 'Base', '18x18', 50),
-(5, 'Pared', '18x18x30', 50),
-(6, 'Base', '30x15', 90),
-(6, 'Pared', '30x15x10', 90),
-(7, 'Base', '20x20', 65),
-(7, 'Pared', '20x20x15', 65),
-(8, 'Base', '25x25', 55),
-(8, 'Pared', '25x25x20', 55),
-(9, 'Base', '15x15', 75),
-(9, 'Pared', '15x15x15', 75),
-(10, 'Base', '20x20', 85),
-(10, 'Pared', '20x20x10', 85);
