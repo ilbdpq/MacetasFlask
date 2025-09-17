@@ -15,8 +15,8 @@ Mensajes = {
     'COMPONENTE_EXITO_MODIFICAR'    : 'Componente modificado exitosamente.',
     'COMPONENTE_EXITO_ELIMINAR'     : 'Componente eliminado exitosamente.',
     'COMPONENTE_ERROR_NOMBRE'       : 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
-    'COMPONENTE_ERROR_MEDIDAS'      : 'Error: Las medidas deben tener el formato AxBxC, donde A, B y C son números entre 1 y 4 dígitos.',
-    'COMPONENTE_ERROR_CANTIDAD'     : 'Error: La cantidad debe ser un número entero positivo.',
+    'COMPONENTE_ERROR_UNIDAD'       : 'Error: Las medidas deben ser "m3" o "kg".',
+    'COMPONENTE_ERROR_CANTIDAD'     : 'Error: La cantidad debe ser un número entero.',
     'COMPONENTE_ERROR_NOENCONTRADO' : 'Error: Componente no encontrado.'
 }
 
@@ -38,9 +38,15 @@ def Validar_Texto(texto):
 
     return False
 
+def Validar_Unidad(unidad):
+    if unidad in ['m', 'm2', 'm3', 'kg', 'l']:
+        return True
+    
+    return False
+
 def Validar_Cantidad(cantidad):
     try:
-        valor = int(cantidad)
+        valor = float(cantidad)
         
         if valor > 0:
             return True
@@ -124,14 +130,14 @@ class Productos:
         self.DB.commit()
         
         return Mensajes['PRODUCTO_EXITO_ELIMINAR']
-    
+
 class Componentes:
     def __init__(self, DB):
         self.DB = DB
-
+    
     def Consultar(self):
         return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
-
+    
     def Consultar_Siguiente_ID(self):
         try:
             resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes"').fetchone()[0]
@@ -140,9 +146,63 @@ class Componentes:
             return 1
         
         return resultado
+    
+    def Consultar_Formateado(self):
+        resultado = self.DB.execute('SELECT nombre, id FROM componentes WHERE habilitado != 0').fetchall()
+        return {fila[1] : f'{fila[0]} ({fila[1]})' for fila in resultado}
+    
+    def Seleccionar(self, id):
+        return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()[0]
+    
+    def Agregar(self, nombre, unidad):
+        if not Validar_Texto(nombre):
+            return Mensajes['COMPONENTE_ERROR_NOMBRE']
+        
+        if not Validar_Unidad(unidad):
+            return Mensajes['COMPONENTE_ERROR_UNIDAD']
+        
+        self.DB.execute('INSERT INTO componentes (nombre, unidad) VALUES (?, ?)', (nombre, unidad,))
+        self.DB.commit()
+        
+        return Mensajes['COMPONENTE_EXITO_AGREGAR']
+    
+    def Modificar(self, id, nombre, unidad):
+        if not Validar_Texto(nombre):
+            return Mensajes['COMPONENTE_ERROR_NOMBRE']
+        
+        if not Validar_Unidad(unidad):
+            return Mensajes['COMPONENTE_ERROR_UNIDAD']
+        
+        self.DB.execute('UPDATE componentes SET nombre = ?, unidad = ? WHERE id = ?', (nombre, unidad, id))
+        self.DB.commit()
+        
+        return Mensajes['COMPONENTE_EXITO_MODIFICAR']
+    
+    def Eliminar(self, id):
+        self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
+        self.DB.commit()
+        
+        return Mensajes['COMPONENTE_EXITO_ELIMINAR']
+    
+    
+class Componentes_Por_Producto:
+    def __init__(self, DB):
+        self.DB = DB
+
+    def Consultar(self):
+        return self.DB.execute('SELECT * FROM componentes_por_producto').fetchall()
+
+    def Consultar_Siguiente_ID(self):
+        try:
+            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes_por_producto"').fetchone()[0]
+
+        except TypeError:
+            return 1
+        
+        return resultado
 
     def Seleccionar(self, id):
-        return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()
+        return self.DB.execute('SELECT * FROM componentes_por_producto WHERE id = ?', (id,)).fetchone()
 
     def Agregar(self, producto, nombre, medidas, cantidad):
         if not Validar_Texto(nombre):
@@ -159,7 +219,7 @@ class Componentes:
         if id_producto is None:
             return Mensajes['COMPONENTE_ERROR_NOENCONTRADO']
         
-        self.DB.execute(f'INSERT INTO componentes (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
+        self.DB.execute(f'INSERT INTO componentes_por_producto (id_producto, nombre, medidas, cantidad) VALUES (?, ?, ?, ?)', (id_producto, nombre, medidas, cantidad))
         self.DB.commit()
         
         return Mensajes['COMPONENTE_EXITO_AGREGAR']
@@ -168,12 +228,12 @@ class Componentes:
         if not Validar_Texto(nombre):
             return 'Error: El nombre solo puede contener letras, números, espacios y guiones.'
         
-        self.DB.execute('UPDATE componentes SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
+        self.DB.execute('UPDATE componentes_por_producto SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
         self.DB.commit()
         
         return Mensajes['COMPONENTE_EXITO_MODIFICAR']
 
     def Eliminar(self, id):
-        self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
+        self.DB.execute('DELETE FROM componentes_por_producto WHERE id = ?', (id,))
         self.DB.commit()
         return Mensajes['COMPONENTE_EXITO_ELIMINAR']

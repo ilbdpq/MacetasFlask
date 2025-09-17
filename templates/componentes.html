@@ -33,14 +33,13 @@
             </div>
 
             <div id="main">
+                <legend>Componentes</legend>
                 <div class="sunken-panel">
                     <table class="interactive">
                         <thead>
                             <th class="primerColumna">ID</th>
-                            <th>Producto</th>
                             <th>Nombre</th>
-                            <th>Medidas</th>
-                            <th>Cantidad</th>
+                            <th>Unidad</th>
                             <th class="ultimaColumna">Acción</th>
                         </thead>
                         {% if componentesLista %}
@@ -50,18 +49,15 @@
                                 <td class="primerColumna">
                                     <input type="text" name="id_modificar" value="{{componente[0]}}" readonly required>
                                 </td>
+
                                 <td>
-                                    <input type="text" name="producto_modificar" value="{{productosFormateados.get(componente[1])}}" required>
+                                    <input type="text" name="nombre_modificar" value="{{componente[1]}}" required>
                                 </td>
+
                                 <td>
-                                    <input type="text" name="nombre_modificar" value="{{componente[2]}}" required>
+                                    <input type="text" name="unidad_modificar" value="{{componente[2]}}" required>
                                 </td>
-                                <td>
-                                    <input type="text" name="medidas_modificar" value="{{componente[3]}}" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="cantidad_modificar" value="{{componente[4]}}" required>
-                                </td>
+
                                 <td class="ultimaColumna">
                                     <div>
                                         <input type="submit" value="Guardar">
@@ -79,25 +75,101 @@
                         <tr>
                             <form action="/componentes/agregar" method="post">
                                 <td class="primerColumna">
-                                    <input type="text" name="id_modificar" value="{{componenteSiguiente}}" readonly required>
-                                </td>
-                                <td>
-                                    <select name="producto_agregar" id="producto_agregar">
-                                        {% for producto in productosFormateados.values() %}
-                                        <option value="{{producto}}">{{producto}}</option>
-                                        {% endfor %}
-                                    </select>
+                                    <input type="text" name="id_agregar" value="{{ componenteSiguiente }}" readonly required>
                                 </td>
                                 <td>
                                     <input type="text" name="nombre_agregar" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="medidas_agregar" required>
+                                    <select name="unidad_agregar" id="unidad_agregar">
+                                        <option value="m">Metros</option>
+                                        <option value="m2">Metros cuadrados</option>
+                                        <option value="m3">Metros cúbicos</option>
+                                        <option value="kg">Kilogramos</option>
+                                        <option value="l">Litros</option>
+                                    </select>
                                 </td>
-                                <td>
-                                    <input type="text" name="cantidad_agregar" required>
+                                <td class="ultimaColumna">
+                                    <input type="submit" value="Agregar">
                                 </td>
+                            </form>
+                        </tr>
+                    </table>
+                </div>
+
+                <legend>Componentes por producto</legend>
+                <div class="sunken-panel">
+                    <table class="interactive">
+                        <thead>
+                            <th class="primerColumna">ID</th>
+                            <th>Producto</th>
+                            <th>Componente</th>
+                            <th>Cantidad</th>
+                            <th>Acción</th>
+                        </thead>
+
+                        {% if componentesPorProductoLista %}
+                            {% for componentePorProducto in componentesPorProductoLista %}
+                                <tr>
+                                    <form action="/componentes/por-producto/modificar">
+                                        <td class="primerColumna">
+                                            <input type="text" name="id_modificar" value="{{ componentePorProducto[0] }}" readonly required>
+                                        </td>
+
+                                        <td>
+                                            <input type="text" name="producto" value="{{ productosFormateados.get( componentePorProducto[1] ) }}">
+                                        </td>
+                                        
+                                        <td>
+                                            <input type="text" name="componente" value="{{ componentesFormateados.get( componentePorProducto[2] ) }}">
+                                        </td>
+
+                                        <td>
+                                            <input type="number" name="cantidad" value="{{ componentePorProducto[3] }}">
+                                        </td>
+
+                                        <td class="ultimaColumna">
+                                            <div>
+                                                <input type="submit">
+
+                                                <form method="post">
+                                                    <input type="hidden" name="id_eliminar" value="{{ componentePorProducto[0] }}">
+                                                    <input type="submit" formaction="/componentes/por-producto/eliminar" value="Eliminar">
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+
+                        <tr>
+                            <form action="/componentes/por-producto/agregar" method="post">
+                                <td class="primerColumna">
+                                    <input type="text" name="id_agregar" value="{{componenteSiguiente}}" readonly required>
+                                </td>
+
                                 <td>
+                                    <select name="id_producto">
+                                        {% for key, value in productosFormateados.items() %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <select name="id_componente">
+                                        {% for key, value in componentesFormateados.items() %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number" name="cantidad">
+                                </td>
+
+                                <td class="ultimaColumna">
                                     <input type="submit" value="Agregar">
                                 </td>
                             </form>

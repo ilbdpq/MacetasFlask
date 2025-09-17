@@ -37,6 +37,7 @@ def Inyectar_Productos():
     DB = Get_DB()
     Productos = fun.Productos(DB)
     Componentes = fun.Componentes(DB)
+    Componentes_Por_Producto = fun.Componentes_Por_Producto(DB)
     
     return dict(
         productosLista = Productos.Consultar(),
@@ -45,7 +46,11 @@ def Inyectar_Productos():
         productosFormateados = Productos.Consultar_Formateado(),
 
         componentesLista = Componentes.Consultar(),
-        componenteSiguiente = Componentes.Consultar_Siguiente_ID()
+        componenteSiguiente = Componentes.Consultar_Siguiente_ID(),
+        componentesFormateados = Componentes.Consultar_Formateado(),
+        
+        componentesPorProductoLista = Componentes_Por_Producto.Consultar(),
+        componentesPorProductoSiguiente = Componentes_Por_Producto.Consultar_Siguiente_ID(),
     )
 
 '''
@@ -106,28 +111,47 @@ def Componentes_Consultar():
 @APP.route('/componentes/agregar', methods=['POST'])
 def Componentes_Agregar():
     if request.method == 'POST':
-        producto = request.form['producto_agregar']
         nombre = request.form['nombre_agregar']
-        medidas = request.form['medidas_agregar']
-        cantidad = request.form['cantidad_agregar']
+        unidad = request.form['unidad_agregar']
 
         Componentes = fun.Componentes(Get_DB())
 
-        return render_template('/componentes.html', mensaje=Componentes.Agregar(producto, nombre, medidas, cantidad))
+        return render_template('/componentes.html', mensaje=Componentes.Agregar(nombre, unidad))
 
     return render_template('/componentes.html')
 
-@APP.route('/componentes/modificar', methods=['POST'])
-def Componentes_Modificar():
-    id = request.form['id_modificar']
-    producto = request.form['producto_modificar']
-    nombre = request.form['nombre_modificar']
-    medidas = request.form['medidas_modificar']
-    cantidad = request.form['cantidad_modificar']
+'''
+Componentes por producto
+'''
+# @APP.route('/componentes-por-producto/', methods=['GET'])
+# def Componentes_Consultar():
+#     return render_template('/componentes_por_producto.html')
 
-    Componentes = fun.Componentes(Get_DB())
+# @APP.route('/componentes-por-producto/agregar', methods=['POST'])
+# def Componentes_Agregar():
+#     if request.method == 'POST':
+#         producto = request.form['producto_agregar']
+#         nombre = request.form['nombre_agregar']
+#         medidas = request.form['medidas_agregar']
+#         cantidad = request.form['cantidad_agregar']
 
-    return render_template('/componentes.html', mensaje=Componentes.Modificar(id, producto, nombre, medidas, cantidad))
+#         Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
+
+#         return render_template('/componentes_por_producto.html', mensaje=Componentes_Por_Producto.Agregar(producto, nombre, medidas, cantidad))
+
+#     return render_template('/componentes_por_producto.html')
+
+# @APP.route('/componentes-por-producto/modificar', methods=['POST'])
+# def Componentes_Modificar():
+#     id = request.form['id_modificar']
+#     producto = request.form['producto_modificar']
+#     nombre = request.form['nombre_modificar']
+#     medidas = request.form['medidas_modificar']
+#     cantidad = request.form['cantidad_modificar']
+
+#     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
+
+#     return render_template('/componentes_por_producto.html', mensaje=Componentes_Por_Producto.Modificar(id, producto, nombre, medidas, cantidad))
 
 with APP.app_context():
     Init_DB()

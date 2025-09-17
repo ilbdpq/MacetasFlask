@@ -21,7 +21,7 @@ CREATE TABLE productos (
 CREATE TABLE componentes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
-    medidas TEXT NOT NULL,
+    unidad TEXT NOT NULL,
     habilitado INTEGER NOT NULL DEFAULT 1
 );
 
@@ -30,7 +30,7 @@ CREATE TABLE componentes_por_producto (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_producto INTEGER NOT NULL,
     id_componente NOT NULL,
-    cantidad INTEGER NOT NULL,
+    cantidad REAL NOT NULL,
     habilitado INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY(id_producto) REFERENCES productos(id)
 );
