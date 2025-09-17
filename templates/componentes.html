@@ -55,7 +55,15 @@
                                 </td>
 
                                 <td>
-                                    <input type="text" name="unidad_modificar" value="{{componente[2]}}" required>
+                                    <select name="unidad_modificar" id="unidad_modificar">
+                                        {% for key, value in componentesUnidades.items() %}
+                                            {% if key == componente[2] %}
+                                                <option selected value="{{ key }}">{{ value }}</option>
+                                            {% else %}
+                                                <option value="{{ key }}">{{ value }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
                                 </td>
 
                                 <td class="ultimaColumna">
@@ -82,11 +90,9 @@
                                 </td>
                                 <td>
                                     <select name="unidad_agregar" id="unidad_agregar">
-                                        <option value="m">Metros</option>
-                                        <option value="m2">Metros cuadrados</option>
-                                        <option value="m3">Metros cúbicos</option>
-                                        <option value="kg">Kilogramos</option>
-                                        <option value="l">Litros</option>
+                                        {% for key, value in componentesUnidades.items() %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% endfor %}
                                     </select>
                                 </td>
                                 <td class="ultimaColumna">

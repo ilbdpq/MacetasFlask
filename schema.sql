@@ -33,6 +33,7 @@ CREATE TABLE componentes_por_producto (
     cantidad REAL NOT NULL,
     habilitado INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY(id_producto) REFERENCES productos(id)
+    FOREIGN KEY(id_componente) REFERENCES componentes(id)
 );
 
 -- Tabla STOCK
@@ -96,3 +97,11 @@ INSERT INTO productos (tipo, nombre, modelo, medidas) VALUES
 ('Macetón', 'Cuadrado Grande', 'ML-018', '40x40x40'),
 ('Macetón', 'Redondo Grande', 'ML-019', '35x35x35'),
 ('Maceta', 'Ovalada', 'M-020', '30x20x15');
+
+-- Insertar datos de ejemplo en COMPONENTES
+INSERT INTO componentes (nombre, unidad) VALUES
+('Agua', 'l'),
+('Cemento', 'kg'),
+('Arena', 'kg'),
+('Grava', 'kg'),
+('Manija de hierro', 'u');
