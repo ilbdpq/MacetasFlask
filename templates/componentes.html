@@ -115,31 +115,47 @@
                         </thead>
 
                         {% if componentesPorProductoLista %}
-                            {% for componentePorProducto in componentesPorProductoLista %}
+                            {% for componentesPorProducto in componentesPorProductoLista %}
                                 <tr>
-                                    <form action="/componentes/por-producto/modificar">
+                                    <form action="/componentes/por-producto/modificar" method="post">
                                         <td class="primerColumna">
-                                            <input type="text" name="id_modificar" value="{{ componentePorProducto[0] }}" readonly required>
+                                            <input type="text" name="id_modificar" value="{{ componentesPorProducto[0] }}" readonly required>
                                         </td>
 
                                         <td>
-                                            <input type="text" name="producto" value="{{ productosFormateados.get( componentePorProducto[1] ) }}">
+                                            <select name="id_producto">
+                                                {% for key, value in productosFormateados.items() %}
+                                                    {% if key == componentesPorProducto[1] %}
+                                                        <option selected value="{{ key }}">{{ value }}</option>
+                                                    {% else %}
+                                                        <option value="{{ key }}">{{ value }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </td>
                                         
                                         <td>
-                                            <input type="text" name="componente" value="{{ componentesFormateados.get( componentePorProducto[2] ) }}">
+                                            <select name="id_componente">
+                                                {% for key, value in componentesFormateados.items() %}
+                                                    {% if key == componentesPorProducto[2] %}
+                                                        <option selected value="{{ key }}">{{ value }}</option>
+                                                    {% else %}
+                                                        <option value="{{ key }}">{{ value }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </td>
 
                                         <td>
-                                            <input type="number" name="cantidad" value="{{ componentePorProducto[3] }}">
+                                            <input type="number" name="cantidad" value="{{ componentesPorProducto[3] }}">
                                         </td>
 
                                         <td class="ultimaColumna">
                                             <div>
-                                                <input type="submit">
+                                                <input type="submit" value="Guardar">
 
                                                 <form method="post">
-                                                    <input type="hidden" name="id_eliminar" value="{{ componentePorProducto[0] }}">
+                                                    <input type="hidden" name="id_eliminar" value="{{ componentesPorProducto[0] }}">
                                                     <input type="submit" formaction="/componentes/por-producto/eliminar" value="Eliminar">
                                                 </form>
                                             </div>

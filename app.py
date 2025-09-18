@@ -148,6 +148,23 @@ def Componentes_Por_Producto_Agregar():
     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
     return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Agregar(id_producto, id_componente, cantidad))
 
+@APP.route('/componentes/por-producto/modificar', methods=['POST'])
+def Componentes_Por_Producto_Modificar():
+    id = request.form['id_modificar']
+    id_producto = request.form['id_producto']
+    id_componente = request.form['id_componente']
+    cantidad = request.form['cantidad']
+    
+    Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
+    return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Modificar(id, id_producto, id_componente, cantidad))
+
+@APP.route('/componentes/por-producto/eliminar', methods=['POST'])
+def Componentes_Por_Producto_Eliminar():
+    id = request.form['id_eliminar']
+    
+    Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
+    return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Eliminar(id))
+
 
 with APP.app_context():
     Init_DB()

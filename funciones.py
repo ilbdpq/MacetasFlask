@@ -70,14 +70,6 @@ def Validar_Cantidad(cantidad):
     except ValueError:
         return False
 
-def Formatear_Producto(producto):
-    # Extrae el número de ID entre paréntesis al final de la cadena, por ejemplo: "Maceta Redonda (10)" -> 10
-    match = re.search(r'\((\d+)\)$', producto.strip())
-    if match:
-        return int(match.group(1))
-
-    return None
-
 
 class Productos:
     def __init__(self, DB):
@@ -177,7 +169,7 @@ class Componentes:
         if not Validar_Unidad(unidad):
             return Mensajes['COMPONENTE_ERROR_UNIDAD']
         
-        self.DB.execute('INSERT INTO componentes (nombre, unidad) VALUES (?, ?)', (nombre, unidad,))
+        self.DB.execute('INSERT INTO componentes (nombre, unidad) VALUES (?, ?)', (nombre, unidad))
         self.DB.commit()
         
         return Mensajes['COMPONENTE_EXITO_AGREGAR']
