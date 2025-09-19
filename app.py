@@ -39,6 +39,7 @@ def Inyectar_Datos():
     Componentes = fun.Componentes(DB)
     Componentes_Por_Producto = fun.Componentes_Por_Producto(DB)
     Stock = fun.Stock(DB)
+    Fabricaciones = fun.Fabricaciones(DB)
     
     return dict(
         productosLista = Productos.Consultar(),
@@ -55,6 +56,9 @@ def Inyectar_Datos():
         componentesPorProductoSiguiente = Componentes_Por_Producto.Consultar_Siguiente_ID(),
         
         stockLista = Stock.Consultar(),
+
+        fabricacionesLista = Fabricaciones.Consultar(),
+        fabricacionSiguiente = Fabricaciones.Consultar_Siguiente_ID(),
     )
 
 '''
@@ -82,10 +86,8 @@ def Productos_Agregar():
 
         Productos = fun.Productos(Get_DB())
         Stock = fun.Stock(Get_DB())
-        
-        # Inicializa el stock del nuevo producto en 0
 
-        return render_template('/productos.html', mensaje=[Productos.Agregar(tipo, nombre, modelo, medidas), Stock.Agregar(id, 'Producto', 0)])
+        return render_template('/productos.html', mensajes=[Productos.Agregar(tipo, nombre, modelo, medidas), Stock.Agregar(id, 'Producto', 0)])
 
     return render_template('/productos.html')
 
@@ -99,7 +101,7 @@ def Productos_Modificar():
 
     Productos = fun.Productos(Get_DB())
 
-    return render_template('/productos.html', mensaje=Productos.Modificar(id, tipo, nombre, modelo, medidas))
+    return render_template('/productos.html', mensajes=[Productos.Modificar(id, tipo, nombre, modelo, medidas)])
 
 @APP.route('/productos/eliminar', methods=['POST'])
 def Productos_Eliminar():
@@ -107,7 +109,7 @@ def Productos_Eliminar():
     
     Productos = fun.Productos(Get_DB())
 
-    return render_template('/productos.html', mensaje=Productos.Eliminar(id))
+    return render_template('/productos.html', mensajes=[Productos.Eliminar(id)])
 
 '''
 Componentes
@@ -125,10 +127,8 @@ def Componentes_Agregar():
 
         Componentes = fun.Componentes(Get_DB())
         Stock = fun.Stock(Get_DB())
-        
-        Stock.Agregar(id, 'Componente', 0) # Inicializa el stock del nuevo componente en 0
 
-        return render_template('/componentes.html', mensaje=Componentes.Agregar(nombre, unidad))
+        return render_template('/componentes.html', mensajes=[Componentes.Agregar(nombre, unidad), Stock.Agregar(id, 'Componente', 0)])
 
     return render_template('/componentes.html')
 
@@ -140,7 +140,7 @@ def Componentes_Modificar():
 
     Componentes = fun.Componentes(Get_DB())
 
-    return render_template('/componentes.html', mensaje=Componentes.Modificar(id, nombre, unidad))
+    return render_template('/componentes.html', mensajes=[Componentes.Modificar(id, nombre, unidad)])
 
 @APP.route('/componentes/eliminar', methods=['POST'])
 def Componentes_Eliminar():
@@ -148,7 +148,7 @@ def Componentes_Eliminar():
     
     Componentes = fun.Componentes(Get_DB())
 
-    return render_template('/componentes.html', mensaje=Componentes.Eliminar(id))
+    return render_template('/componentes.html', mensajes=[Componentes.Eliminar(id)])
 
 @APP.route('/componentes/por-producto/agregar', methods=['POST'])
 def Componentes_Por_Producto_Agregar():
@@ -157,7 +157,7 @@ def Componentes_Por_Producto_Agregar():
     cantidad = request.form['cantidad']
     
     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Agregar(id_producto, id_componente, cantidad))
+    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Agregar(id_producto, id_componente, cantidad)])
 
 @APP.route('/componentes/por-producto/modificar', methods=['POST'])
 def Componentes_Por_Producto_Modificar():
@@ -167,14 +167,14 @@ def Componentes_Por_Producto_Modificar():
     cantidad = request.form['cantidad']
     
     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Modificar(id, id_producto, id_componente, cantidad))
+    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Modificar(id, id_producto, id_componente, cantidad)])
 
 @APP.route('/componentes/por-producto/eliminar', methods=['POST'])
 def Componentes_Por_Producto_Eliminar():
     id = request.form['id_eliminar']
     
     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Eliminar(id))
+    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Eliminar(id)])
 
 '''
 Stock
@@ -190,11 +190,11 @@ def Stock_Modificar():
 
     Stock = fun.Stock(Get_DB())
 
-    return render_template('/stock.html', mensaje=Stock.Modificar(id, cantidad))
+    return render_template('/stock.html', mensajes=[Stock.Modificar(id, cantidad)])
 
 with APP.app_context():
     Init_DB()
 
 if __name__ == '__main__':
-    APP.config['SECRET_KEY'] = 'bdpq'
+    # APP.config['SECRET_KEY'] = 'bdpq'
     APP.run(debug=True)

@@ -7,7 +7,8 @@ Mensajes = {
     'PRODUCTO_EXITO_ELIMINAR'                 : 'Producto eliminado exitosamente.',
     'PRODUCTO_ERROR_TIPO'                     : 'Error: El tipo solo puede contener letras, números, espacios y guiones.',
     'PRODUCTO_ERROR_NOMBRE'                   : 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
-    'PRODCUTO_ERROR_MODELO'                   : 'Error: El modelo solo puede contener letras, números, espacios y guiones.',
+    'PRODUCTO_ERROR_MODELO'                   : 'Error: El modelo solo puede contener letras, números, espacios y guiones.',
+    'PRODUCTO_ERROR_DUPLICADO'                : 'Error: Ya existe un producto con ese nombre y modelo.',
     'PRODUCTO_ERROR_MEDIDAS'                  : 'Error: Las medidas deben tener el formato AxBxC, donde A, B y C son números entre 1 y 4 dígitos.',
     'PRODUCTO_ERROR_NOENCONTRADO'             : 'Error: Producto no encontrado.',
     
@@ -15,6 +16,7 @@ Mensajes = {
     'COMPONENTE_EXITO_MODIFICAR'              : 'Componente modificado exitosamente.',
     'COMPONENTE_EXITO_ELIMINAR'               : 'Componente eliminado exitosamente.',
     'COMPONENTE_ERROR_NOMBRE'                 : 'Error: El nombre solo puede contener letras, números, espacios y guiones.',
+    'COMPONENTE_ERROR_DUPLICADO'              : 'Error: Ya existe un componente con ese nombre.',
     'COMPONENTE_ERROR_UNIDAD'                 : 'Error: Las medidas deben ser "m3" o "kg".',
     'COMPONENTE_ERROR_CANTIDAD'               : 'Error: La cantidad debe ser un número entero.',
     'COMPONENTE_ERROR_NOENCONTRADO'           : 'Error: Componente no encontrado.',
@@ -24,7 +26,12 @@ Mensajes = {
     'COMPONENTE-POR-PRODUCTO_EXITO_ELIMINAR'  : 'Componente por producto eliminado exitosamente.',
     'COMPONENTE-POR-PRODUCTO_ERROR_CANTIDAD'  : 'Error: La cantidad debe ser un número positivo.',
 
-    'STOCK_ERROR_CANTIDAD'                    : 'Error: La cantidad debe ser cero o un número positivo.'
+    'STOCK_ERROR_ITEM'                        : 'Error: El ítem no existe o ya tiene stock inicializado.',
+    'STOCK_ERROR_CANTIDAD'                    : 'Error: La cantidad debe ser cero o un número positivo.',
+
+    'FABRICACION_EXITO_AGREGAR'               : 'Fabricación agregada exitosamente.',
+    'FABRICACION_EXITO_MODIFICAR'             : 'Fabricación modificada exitosamente.',
+    'FABRICACION_ERROR_CANTIDAD'              : 'Error: La cantidad debe ser un número positivo.',
 }
 
 UNIDADES = {
@@ -72,6 +79,37 @@ def Validar_Cantidad(cantidad, minimo=1):
     except ValueError:
         return False
 
+def Validar_Duplicado(DB, tabla, columna, valor):
+    consulta = f'SELECT COUNT(*) FROM {tabla} WHERE {columna} = ? AND habilitado != 0'
+    resultado = DB.execute(consulta, (valor,)).fetchone()[0]
+    
+    if resultado > 0:
+        return False
+    
+    return True
+
+def Validar_Item(DB, tipo_item, id_item):
+    if tipo_item not in ['Producto', 'Componente']:
+        return False
+    
+    tabla = 'productos' if tipo_item == 'Producto' else 'componentes'
+    consulta = f'SELECT COUNT(*) FROM {tabla} WHERE id = ? AND habilitado != 0'
+    resultado = DB.execute(consulta, (id_item,)).fetchone()[0]
+    
+    if resultado == 0:
+        return False
+    
+    return True
+
+def Validar_Stock(DB, tipo_item, id_item):
+    consulta = 'SELECT COUNT(*) FROM stock WHERE tipo_item = ? AND id_item = ?'
+    resultado = DB.execute(consulta, (tipo_item, id_item)).fetchone()[0]
+    
+    if resultado == 0:
+        return True
+    
+    return False
+
 
 class Productos:
     def __init__(self, DB):
@@ -81,7 +119,9 @@ class Productos:
         return self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
     
     def Consultar_Tipos(self):
-        return self.DB.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()[0]
+        cursor = self.DB.cursor()
+        cursor.row_factory = lambda cursor, row: row[0]
+        return cursor.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()
     
     def Consultar_Siguiente_ID(self):
         resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
@@ -106,10 +146,13 @@ class Productos:
             return Mensajes['PRODUCTO_ERROR_NOMBRE']
         
         if not Validar_Texto(modelo):
-            return Mensajes['PRODCUTO_ERROR_MODELO']
+            return Mensajes['PRODUCTO_ERROR_MODELO']
         
         if not Validar_Medidas(medidas):
             return Mensajes['PRODUCTO_ERROR_MEDIDAS']
+
+        if not (Validar_Duplicado(self.DB, 'productos', 'nombre', nombre) or Validar_Duplicado(self.DB, 'productos', 'modelo', modelo)):
+            return Mensajes['PRODUCTO_ERROR_DUPLICADO']
         
         self.DB.execute('INSERT INTO productos (tipo, nombre, modelo, medidas) VALUES (?, ?, ?, ?)', (tipo, nombre, modelo, medidas))
         self.DB.commit()
@@ -124,7 +167,7 @@ class Productos:
             return Mensajes['PRODUCTO_ERROR_NOMBRE']
         
         if not Validar_Texto(modelo):
-            return Mensajes['PRODCUTO_ERROR_MODELO']
+            return Mensajes['PRODUCTO_ERROR_MODELO']
         
         if not Validar_Medidas(medidas):
             return Mensajes['PRODUCTO_ERROR_MEDIDAS']
@@ -170,6 +213,9 @@ class Componentes:
         
         if not Validar_Unidad(unidad):
             return Mensajes['COMPONENTE_ERROR_UNIDAD']
+
+        if not Validar_Duplicado(self.DB, 'componentes', 'nombre', nombre):
+            return Mensajes['COMPONENTE_ERROR_DUPLICADO']
         
         self.DB.execute('INSERT INTO componentes (nombre, unidad) VALUES (?, ?)', (nombre, unidad))
         self.DB.commit()
@@ -254,6 +300,12 @@ class Stock:
         return resultado
 
     def Agregar(self, id_item, tipo_item, cantidad):
+        if not Validar_Item(self.DB, tipo_item, id_item):
+            return Mensajes['STOCK_ERROR_ITEM']
+
+        if not Validar_Stock(self.DB, tipo_item, id_item):
+            return Mensajes['STOCK_ERROR_ITEM']
+
         if not Validar_Cantidad(cantidad, minimo=0):
             return Mensajes['STOCK_ERROR_CANTIDAD']
         
@@ -275,3 +327,37 @@ class Stock:
         self.DB.execute('DELETE FROM stock WHERE id = ?', (id,))
         self.DB.commit()
         return 'Stock eliminado exitosamente.'
+
+class Fabricaciones:
+    def __init__(self, DB):
+        self.DB = DB
+
+    def Consultar(self):
+        return self.DB.execute('SELECT * FROM fabricaciones_encabezado').fetchall()
+
+    def Consultar_Siguiente_ID(self):
+        try:
+            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "fabricaciones"').fetchone()[0]
+
+        except TypeError:
+            return 1
+        
+        return resultado
+
+    def Agregar(self, id_producto, cantidad, costo, precio_venta):
+        if not Validar_Cantidad(cantidad):
+            return Mensajes['FABRICACION_ERROR_CANTIDAD']
+        
+        self.DB.execute(f'INSERT INTO fabricaciones (id_producto, cantidad, costo, precio_venta) VALUES (?, ?, ?, ?)', (id_producto, cantidad, costo, precio_venta))
+        self.DB.commit()
+        
+        return Mensajes['FABRICACION_EXITO_AGREGAR']
+
+    def Modificar(self, id, id_producto, cantidad, costo, precio_venta):
+        if not Validar_Cantidad(cantidad):
+            return Mensajes['FABRICACION_ERROR_CANTIDAD']
+        
+        self.DB.execute('UPDATE fabricaciones SET id_producto = ?, cantidad = ?, costo = ?, precio_venta = ? WHERE id = ?', (id_producto, cantidad, costo, precio_venta, id))
+        self.DB.commit()
+        
+        return Mensajes['FABRICACION_EXITO_MODIFICAR']

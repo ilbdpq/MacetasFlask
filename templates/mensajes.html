@@ -1,0 +1,19 @@
+{% if not productosLista %}
+    <div class="field-border-disabled" id="mensaje">
+        No hay productos
+    </div>
+{% endif %}
+
+{% if not componentesLista %}
+    <div class="field-border-disabled" id="mensaje">
+        No hay componentes
+    </div>
+{% endif %}
+
+{% if mensajes %}
+    {% for mensaje in mensajes %}
+        <div class="field-border-disabled" id="mensaje">
+            {{mensaje}}
+        </div>
+    {% endfor %}
+{% endif %}

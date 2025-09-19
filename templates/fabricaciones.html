@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Practico</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+</head>
+
+<body>
+    <div class="window">
+        {% include 'header.html' %}
+
+        <div class="window-body" id="container">
+            <div id="aside">
+                {% include 'nav.html' %}
+                {% include 'mensajes.html' %}
+            </div>
+
+            <div id="main">
+                <legend>Fabricaciones</legend>
+                <div class="sunken-panel">
+                    <table class="interactive">
+                        <thead>
+                            <th class="primerColumna">ID</th>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>$Costo</th>
+                            <th>$Venta</th>
+                            <th class="ultimaColumna">Acción</th>
+                        </thead>
+
+                        {% if fabricacionesLista %}
+                            {% for fabricacion in fabricacionesLista %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
