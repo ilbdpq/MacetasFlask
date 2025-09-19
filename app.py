@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, redirect
 from flask import request
 from flask import g
 
@@ -38,6 +38,7 @@ def Inyectar_Datos():
     Productos = fun.Productos(DB)
     Componentes = fun.Componentes(DB)
     Componentes_Por_Producto = fun.Componentes_Por_Producto(DB)
+    Stock = fun.Stock(DB)
     
     return dict(
         productosLista = Productos.Consultar(),
@@ -52,6 +53,8 @@ def Inyectar_Datos():
         
         componentesPorProductoLista = Componentes_Por_Producto.Consultar(),
         componentesPorProductoSiguiente = Componentes_Por_Producto.Consultar_Siguiente_ID(),
+        
+        stockLista = Stock.Consultar(),
     )
 
 '''
@@ -71,14 +74,18 @@ def Productos_Consultar():
 @APP.route('/productos/agregar', methods=['GET', 'POST'])
 def Productos_Agregar():
     if request.method == 'POST':
+        id = request.form['id_agregar']
         tipo = request.form['tipo_agregar']
         nombre = request.form['nombre_agregar']
         modelo = request.form['modelo_agregar']
         medidas = request.form['medidas_agregar']
 
         Productos = fun.Productos(Get_DB())
+        Stock = fun.Stock(Get_DB())
+        
+        # Inicializa el stock del nuevo producto en 0
 
-        return render_template('/productos.html', mensaje=Productos.Agregar(tipo, nombre, modelo, medidas))
+        return render_template('/productos.html', mensaje=[Productos.Agregar(tipo, nombre, modelo, medidas), Stock.Agregar(id, 'Producto', 0)])
 
     return render_template('/productos.html')
 
@@ -112,10 +119,14 @@ def Componentes_Consultar():
 @APP.route('/componentes/agregar', methods=['POST'])
 def Componentes_Agregar():
     if request.method == 'POST':
+        id = request.form['id_agregar']
         nombre = request.form['nombre_agregar']
         unidad = request.form['unidad_agregar']
 
         Componentes = fun.Componentes(Get_DB())
+        Stock = fun.Stock(Get_DB())
+        
+        Stock.Agregar(id, 'Componente', 0) # Inicializa el stock del nuevo componente en 0
 
         return render_template('/componentes.html', mensaje=Componentes.Agregar(nombre, unidad))
 
@@ -165,6 +176,21 @@ def Componentes_Por_Producto_Eliminar():
     Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
     return render_template('/componentes.html', mensaje=Componentes_Por_Producto.Eliminar(id))
 
+'''
+Stock
+'''
+@APP.route('/stock/', methods=['GET'])
+def Stock_Consultar():
+    return render_template('/stock.html')
+
+@APP.route('/stock/modificar', methods=['POST'])
+def Stock_Modificar():
+    id = request.form['id_modificar']
+    cantidad = request.form['cantidad_modificar']
+
+    Stock = fun.Stock(Get_DB())
+
+    return render_template('/stock.html', mensaje=Stock.Modificar(id, cantidad))
 
 with APP.app_context():
     Init_DB()

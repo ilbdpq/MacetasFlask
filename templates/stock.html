@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Practico</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+</head>
+
+<body>
+    <div class="window">
+        {% include 'header.html' %}
+
+        <div class="window-body" id="container">
+            <div id="aside">
+                {% include 'nav.html' %}
+    
+                {% if not stockLista %}
+                    <div class="field-border-disabled" id="mensaje">
+                        No hay productos o componentes
+                    </div>
+                {% elif mensaje %}
+                    <div class="field-border-disabled" id="mensaje">
+                        {{mensaje}}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="main">
+                <legend>Stock</legend>
+                <div class="sunken-panel">
+                    <table class="interactive">
+                        <thead>
+                            <th style="width: 5%;" class="primerColumna">ID</th>
+                            <th style="width: 10%;">Tipo</th>
+                            <th style="width: 50%;">Item</th>
+                            <th style="width: 20%;">Cantidad</th>
+                            <th style="width: 5%;" class="ultimaColumna">Acción</th>
+                        </thead>
+
+                        {% if stockLista %}
+                            {% for stock in stockLista %}
+                                <tr>
+                                    <form action="/stock/modificar" method="post">
+                                        <td class="primerColumna">
+                                            <input type="text" name="id_modificar" value="{{stock[0]}}" readonly required>
+                                        </td>
+                                        <td class="columnaReadonly">
+                                            <input type="text" name="tipo_modificar" value="{{stock[1]}}" readonly required>
+                                        </td>
+                                        <td class="columnaReadonly">
+                                            {% if stock[1] == 'Producto' %}
+                                                <input type="text" name="item_modificar" value="{{ productosFormateados.get(stock[2]) }}" readonly required>
+                                            {% elif stock[1] == 'Componente' %}
+                                                <input type="text" name="item_modificar" value="{{ componentesFormateados.get(stock[2]) }}" readonly required>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="scrollColumna">
+                                                <button type="button" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.dispatchEvent(new Event('input'));">-</button>
+                                                <input type="number" step="1" min="0" onmousewheel name="cantidad_modificar" value="{{stock[3]}}" required>
+                                                <button type="button" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.dispatchEvent(new Event('input'));">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="ultimaColumna">
+                                            <div>
+                                                <input type="submit" value="Guardar">
+                                            </div>
+                                        </td>
+                                    </form>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
