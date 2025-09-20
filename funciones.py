@@ -333,7 +333,35 @@ class Fabricaciones:
         self.DB = DB
 
     def Consultar(self):
-        return self.DB.execute('SELECT * FROM fabricaciones_encabezado').fetchall()
+        consulta = '''\
+            SELECT
+                cab.fecha,
+                GROUP_CONCAT(
+                    det.id_producto || ':' ||
+                    det.cantidad || ',' ||
+                    det.precio_costo || ',' ||
+                    det.precio_venta
+                    , ';')
+            FROM fabricaciones_encabezado cab
+            JOIN fabricaciones_detalle det ON det.id_encabezado = cab.id
+            GROUP BY cab.fecha'''
+
+        fabricaciones = self.DB.execute(consulta).fetchall()
+        fabricacionesLista = {}
+
+        for fechas, productos in fabricaciones:
+            fecha = {}
+
+            for producto in productos.split(';'):
+                id_producto_str, valores_str = producto.split(':')
+                id_producto = int(id_producto_str)
+                valores = [float(valor) if '.' in valor else int(valor) for valor in valores_str.split(',')]
+                fecha[id_producto] = valores
+
+            fabricacionesLista[fechas] = fecha
+
+        return fabricacionesLista
+        
 
     def Consultar_Siguiente_ID(self):
         try:

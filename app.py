@@ -192,6 +192,13 @@ def Stock_Modificar():
 
     return render_template('/stock.html', mensajes=[Stock.Modificar(id, cantidad)])
 
+'''
+Fabricaciones
+'''
+@APP.route('/fabricaciones/', methods=['GET'])
+def Fabricaciones_Consultar():
+    return render_template('/fabricaciones.html')
+
 with APP.app_context():
     Init_DB()
 

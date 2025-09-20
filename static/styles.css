@@ -145,3 +145,13 @@ legend {
     padding: 0;
     margin-bottom: -1rem;
 }
+
+#fabricaciones table tbody tr input {
+    color: #222;
+}
+#fabricaciones table tbody tr:nth-child(even) input {
+    background: #CCC;
+}
+#fabricaciones table tbody tr:nth-child(odd) input {
+    background: #DDD;
+}
