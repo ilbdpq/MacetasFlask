@@ -1,0 +1,58 @@
+<header>
+    <a href="/">Macetas S.A.</a>
+</header>
+
+<nav>
+    <legend>Navegar</legend>
+    <div>
+        <ul>
+            <li>
+                <details open>
+                    <summary>Cargar datos</summary>
+                    <ul>
+                        <li><a href="/productos/">Productos</a></li>
+                        <li><a href="/componentes/">Componentes</a></li>
+                        <li><a href="/stock/">Stock</a></li>
+                        <li><a href="/fabricaciones/">Fabricaciones</a></li>
+                        <li>Facturas</li>
+                    </ul>
+                </details>
+            </li>
+            <li>
+                <details closed>
+                    <summary>Recuperar datos</summary>
+                    <ul>
+                        <li><a href="/productos/recuperar">Productos</a></li>
+                        <li><a href="/componentes/recuperar">Componentes</a></li>
+                        <li><a href="/stock/recuperar">Stock</a></li>
+                        <li><a href="/fabricaciones/recuperar">Fabricaciones</a></li>
+                        <li><a href="/facturas/recuperar">Facturas</a></li>
+                    </ul>
+                </details>
+            </li>
+            <li>
+                <summary>Informes</summary>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+{% if not productosLista %}
+<div class="mensaje">
+    No hay productos
+</div>
+{% endif %}
+
+{% if not componentesLista %}
+    <div class="mensaje">
+        No hay componentes
+    </div>
+{% endif %}
+
+{% if mensajes %}
+    {% for mensaje in mensajes %}
+        <div class="mensaje">
+            {{mensaje}}
+        </div>
+    {% endfor %}
+{% endif %}

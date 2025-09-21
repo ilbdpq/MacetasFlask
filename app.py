@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, render_template, url_for, redirect
 from flask import request
 from flask import g
+import datetime
 
 import funciones as fun
 
@@ -59,6 +60,7 @@ def Inyectar_Datos():
 
         fabricacionesLista = Fabricaciones.Consultar(),
         fabricacionSiguiente = Fabricaciones.Consultar_Siguiente_ID(),
+        fechaHoy = datetime.datetime.now().strftime('%Y-%m-%d')
     )
 
 '''

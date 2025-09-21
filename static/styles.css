@@ -34,6 +34,7 @@ html {
     column-gap: 1rem;
     row-gap: 1rem;
     height: 100%;
+    padding-bottom: 1rem;
 }
 
 #aside {
@@ -138,6 +139,10 @@ table.interactive {
     table.interactive .scrollColumna input {
         width: 50%;
     }
+    table.interactive input[type="date"] {
+        background: none;
+        border: none;
+    }
 
 legend {
     font-family: sans-serif;
@@ -146,12 +151,12 @@ legend {
     margin-bottom: -1rem;
 }
 
-#fabricaciones table tbody tr input {
+.fabricaciones table tbody tr input {
     color: #222;
 }
-#fabricaciones table tbody tr:nth-child(even) input {
+.fabricaciones table tbody tr:nth-child(even) input {
     background: #CCC;
 }
-#fabricaciones table tbody tr:nth-child(odd) input {
+.fabricaciones table tbody tr:nth-child(odd) input {
     background: #DDD;
 }
