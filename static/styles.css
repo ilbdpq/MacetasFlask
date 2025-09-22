@@ -122,6 +122,9 @@ table.interactive {
     table.interactive tr:nth-child(even) select {
         background-color: #EEE;
     }
+    table.interactive tr:nth-child(even) select:focus {
+        background-color: navy;
+    }
     table.interactive tr:nth-child(even) .columnaReadonly input {
         background: #DDD;
     }
@@ -139,9 +142,13 @@ table.interactive {
     table.interactive .scrollColumna input {
         width: 50%;
     }
-    table.interactive input[type="date"] {
+    table.interactive tr input[type="date"],
+    table.interactive tr input[type="date"]:focus,
+    table.interactive tr input[type="date"]:focus-visible {
         background: none;
+        color: inherit;
         border: none;
+        outline: none;
     }
 
 legend {

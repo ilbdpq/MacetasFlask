@@ -201,6 +201,22 @@ Fabricaciones
 def Fabricaciones_Consultar():
     return render_template('/fabricaciones.html')
 
+@APP.route('/fabricaciones/agregar', methods=['POST'])
+def Fabricaciones_Agregar():
+    if request.method == 'POST':
+        fecha = request.form['agregar_fecha']
+        productos = request.form.getlist('agregar_producto')
+        cantidades = request.form.getlist('agregar_cantidad')
+        costos = request.form.getlist('agregar_costo')
+        ventas = request.form.getlist('agregar_venta')
+
+        Fabricaciones = fun.Fabricaciones(Get_DB())
+        Stock = fun.Stock(Get_DB())
+
+        return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas)])
+
+    return render_template('/fabricaciones.html')
+
 with APP.app_context():
     Init_DB()
 

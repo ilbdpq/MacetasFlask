@@ -90,11 +90,11 @@
                     {% endfor %}
                 {% endif %}
                 <div class="sunken-panel">
-                    <table class="interactive">
-                        <form action="/fabricaciones/agregar" method="post">
+                    <form action="/fabricaciones/agregar" method="post">
+                        <table class="interactive">
                             <thead>
                                 <th style="width: 15%; text-align: center;">
-                                    <input type="date" value="{{ fechaHoy }}" name="fecha">
+                                    <input type="date" value="{{ fechaHoy }}" name="agregar_fecha" required>
                                 </th>
                                 <th style="width: 40%;">Producto</th>
                                 <th style="width: 15%;">Cantidad</th>
@@ -108,43 +108,56 @@
                                         <button type="button" onclick="agregarFilaFabricacion()" style="width: 100%;">+</button>
 
                                         <script>
-                                        function agregarFilaFabricacion() {
-                                            const fila = document.querySelector('.fabricacionesFila');
-                                            const nuevaFila = fila.cloneNode(true);
+                                            function agregarFilaFabricacion() {
+                                                const fila = document.querySelector('.fabricacionesFila');
+                                                const nuevaFila = fila.cloneNode(true);
 
-                                            // Limpiar los valores de los inputs en la nueva fila
-                                            nuevaFila.querySelectorAll('input, select').forEach(el => {
-                                                if (el.type === 'text' || el.type === 'number' || el.type === 'date') {
-                                                    el.value = '';
-                                                }
-                                            });
+                                                // Limpiar los valores de los inputs/selects en la nueva fila
+                                                nuevaFila.querySelectorAll('input, select').forEach(el => {
+                                                    if (el.type === 'number' || el.type === 'text' || el.type === 'date') {
+                                                        el.value = '';
+                                                    }
+                                                });
 
-                                            // Insertar la nueva fila antes del botón "Subir"
-                                            const subirRow = fila.parentNode.querySelector('tr:last-child');
-                                            fila.parentNode.insertBefore(nuevaFila, subirRow);
-                                        }
+                                                // Insertar la nueva fila antes del botón "Subir"
+                                                const tabla = fila.closest('tbody');
+                                                const submitRow = tabla.querySelector('tr:last-child');
+                                                tabla.insertBefore(nuevaFila, submitRow);
+                                            }
                                         </script>
                                     </td>
                                     <td>
-                                        <select name="id_producto">
+                                        <select name="agregar_producto" required>
                                             {% for key, value in productosFormateados.items() %}
                                                 <option value="{{ key }}">{{ value }}</option>
                                             {% endfor %}
                                         </select>
                                     </td>
-                                    <td><input type="number" onmousewheel></td>
-                                    <td><input type="number" onmousewheel></td>
-                                    <td><input type="number" onmousewheel></td>
+                                    <td><input type="number" name="agregar_cantidad" onwheel="handleWheel(event, this, 1)" min="0" step="1" required></td>
+                                    <td><input type="number" name="agregar_costo" onwheel="handleWheel(event, this, 0.1)" min="0" step="0.1" required></td>
+                                    <td><input type="number" name="agregar_venta" onwheel="handleWheel(event, this, 0.1)" min="0" step="0.1" required></td>
+                                    <script>
+                                    function handleWheel(e, input, step) {
+                                        e.preventDefault();
+                                        let value = parseFloat(input.value) || 0;
+                                        let multiplier = e.shiftKey ? 10 : 1;
+                                        let delta = (e.deltaY < 0 ? 1 : -1) * step * multiplier;
+                                        let newValue = value + delta;
+                                        if (input.min !== undefined && newValue < parseFloat(input.min)) newValue = parseFloat(input.min);
+                                        input.value = Math.round(newValue * 100000) / 100000;
+                                        input.dispatchEvent(new Event('input'));
+                                    }
+                                    </script>
                                 </tr>
-                                
+
                                 <tr>
                                     <td colspan="6">
                                         <input type="submit" value="Subir">
                                     </td>
                                 </tr>
                             </tbody>
-                        </form>
-                    </table>
+                        </table>
+                    </form>
                 </div>
             </div>
         </div>

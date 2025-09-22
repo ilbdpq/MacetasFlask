@@ -372,11 +372,18 @@ class Fabricaciones:
         
         return resultado
 
-    def Agregar(self, id_producto, cantidad, costo, precio_venta):
-        if not Validar_Cantidad(cantidad):
-            return Mensajes['FABRICACION_ERROR_CANTIDAD']
+    def Agregar(self, fecha, productos, cantidades, costos, ventas):
+        row = self.DB.execute('SELECT id FROM fabricaciones_encabezado WHERE fecha = ?', (fecha,)).fetchone()
+
+        if row:
+            id_encabezado = row[0]
+
+        else:
+            id_encabezado = self.DB.execute('INSERT INTO fabricaciones_encabezado (fecha) VALUES (?)', (fecha,)).lastrowid
+
+        for i in range(len(productos)):
+            self.DB.execute(f'INSERT INTO fabricaciones_detalle (id_encabezado, id_producto, cantidad, precio_costo, precio_venta) VALUES ({id_encabezado}, {productos[i]}, {cantidades[i]}, {costos[i]}, {ventas[i]})')
         
-        self.DB.execute(f'INSERT INTO fabricaciones (id_producto, cantidad, costo, precio_venta) VALUES (?, ?, ?, ?)', (id_producto, cantidad, costo, precio_venta))
         self.DB.commit()
         
         return Mensajes['FABRICACION_EXITO_AGREGAR']
