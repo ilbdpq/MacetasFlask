@@ -15,16 +15,7 @@
         <div class="window-body" id="container">
             <div id="aside">
                 {% include 'nav.html' %}
-    
-                {% if not stockLista %}
-                    <div class="field-border-disabled" id="mensaje">
-                        No hay productos o componentes
-                    </div>
-                {% elif mensaje %}
-                    <div class="field-border-disabled" id="mensaje">
-                        {{mensaje}}
-                    </div>
-                {% endif %}
+                {% include 'mensajes.html' %}
             </div>
 
             <div id="main">

@@ -213,7 +213,7 @@ def Fabricaciones_Agregar():
         Fabricaciones = fun.Fabricaciones(Get_DB())
         Stock = fun.Stock(Get_DB())
 
-        return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas)])
+        return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas), Stock.Agregar_Fabricacion(productos, cantidades)])
 
     return render_template('/fabricaciones.html')
 

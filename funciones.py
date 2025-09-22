@@ -26,12 +26,13 @@ Mensajes = {
     'COMPONENTE-POR-PRODUCTO_EXITO_ELIMINAR'  : 'Componente por producto eliminado exitosamente.',
     'COMPONENTE-POR-PRODUCTO_ERROR_CANTIDAD'  : 'Error: La cantidad debe ser un número positivo.',
 
+    'STOCK_EXITO_MODIFICAR'                   : 'Stock modificado exitosamente.',
     'STOCK_ERROR_ITEM'                        : 'Error: El ítem no existe o ya tiene stock inicializado.',
     'STOCK_ERROR_CANTIDAD'                    : 'Error: La cantidad debe ser cero o un número positivo.',
 
     'FABRICACION_EXITO_AGREGAR'               : 'Fabricación agregada exitosamente.',
     'FABRICACION_EXITO_MODIFICAR'             : 'Fabricación modificada exitosamente.',
-    'FABRICACION_ERROR_CANTIDAD'              : 'Error: La cantidad debe ser un número positivo.',
+    'FABRICACION_ERROR_PRODUCTO_DUPLICADO'    : 'Error: No se pueden agregar productos duplicados en la misma fabricación.',
 }
 
 UNIDADES = {
@@ -314,6 +315,20 @@ class Stock:
         
         return 'Stock agregado exitosamente.'
 
+    def Agregar_Fabricacion(self, id_items, cantidades):
+        for i in range(len(id_items)):
+            if not Validar_Item(self.DB, 'Producto', id_items[i]):
+                return Mensajes['STOCK_ERROR_ITEM']
+
+            if not Validar_Cantidad(cantidades[i], minimo=0):
+                return Mensajes['STOCK_ERROR_CANTIDAD']
+        
+            self.DB.execute(f'UPDATE stock SET cantidad = cantidad + ? WHERE id_item = ? AND tipo_item = "Producto"', (cantidades[i], id_items[i]))
+        
+        self.DB.commit()
+        
+        return 'Stock actualizado exitosamente.'
+
     def Modificar(self, id, cantidad):
         if not Validar_Cantidad(cantidad):
             return Mensajes['STOCK_ERROR_CANTIDAD']
@@ -321,12 +336,7 @@ class Stock:
         self.DB.execute('UPDATE stock SET cantidad = ? WHERE id = ?', (cantidad, id))
         self.DB.commit()
         
-        return 'Stock modificado exitosamente.'
-
-    def Eliminar(self, id):
-        self.DB.execute('DELETE FROM stock WHERE id = ?', (id,))
-        self.DB.commit()
-        return 'Stock eliminado exitosamente.'
+        return Mensajes['STOCK_EXITO_MODIFICAR']
 
 class Fabricaciones:
     def __init__(self, DB):
@@ -373,6 +383,9 @@ class Fabricaciones:
         return resultado
 
     def Agregar(self, fecha, productos, cantidades, costos, ventas):
+        if len(productos) != len(set(productos)):
+            return Mensajes['FABRICACION_ERROR_PRODUCTO_DUPLICADO']
+        
         row = self.DB.execute('SELECT id FROM fabricaciones_encabezado WHERE fecha = ?', (fecha,)).fetchone()
 
         if row:
