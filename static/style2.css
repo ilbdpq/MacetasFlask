@@ -11,9 +11,9 @@ html {
     --color-grisoscuro: #808080;
     --color-gris: #BBB;
     --color-blanco: #EEE;
-    --borde-raised: var(--color-blanco) 2px outset;
+    --borde-raised: 2px outset var(--color-blanco);
     --borde-sunken: var(--color-blanco) 2px inset;
-    --borde-sunken2: var(--color-gris) 2px inset;
+    --borde-grooved: var(--color-blanco) 4px groove;
     --borde-ridged: var(--color-blanco) 4px ridge;
     --fuente-grande: 1.5rem;
 
@@ -108,7 +108,7 @@ legend {
 }
 
 table {
-    border: var(--borde-sunken);
+    border: var(--borde-grooved);
     width: 100%;
     border-spacing: 0;
 }
@@ -119,7 +119,6 @@ table * {
 table div {
     display: flex;
     justify-content: space-between;
-    padding: 0 0.25rem;
 }
 table div p {
     width: 100%;
@@ -127,16 +126,42 @@ table div p {
 table th {
     border: var(--borde-raised);
     font-weight: normal;
+    height: 1.5rem;
 }
 table td {
-    border: var(--borde-sunken2);
+    border: var(--borde-sunken);
     background-color: var(--color-blanco);
-    padding: 0 0.25rem;
+    height: 1.5rem;
 }
 
 input {
     background-color: var(--color-blanco);
     border: var(--borde-sunken);
+    border-color: var(--color-blanco) var(--color-gris) var(--color-gris) var(--color-blanco);
+}
+input[type=button] {
+    background-color: var(--color-gris);
+    border: var(--borde-raised);
+    border-color: var(--color-blanco) var(--color-gris) var(--color-gris) var(--color-blanco);
+}
+input[type=button]:active {
+    border: var(--borde-sunken);
+}
+input[type=submit] {
+    background-color: var(--color-gris);
+    border: var(--borde-raised);
+}
+input[type=submit]:active {
+    border: var(--borde-sunken);
+}
+select {
+    background-color: var(--color-blanco);
+    border: var(--borde-sunken);
+    height: calc(100% - 4px);
+}
+select:focus {
+    background-color: var(--color-azul);
+    color: var(--color-blanco);
 }
 
 @media (max-width: 720px), (orientation: portrait) {

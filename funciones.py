@@ -33,6 +33,11 @@ Mensajes = {
     'FABRICACION_EXITO_AGREGAR'               : 'Fabricación agregada exitosamente.',
     'FABRICACION_EXITO_MODIFICAR'             : 'Fabricación modificada exitosamente.',
     'FABRICACION_ERROR_PRODUCTO_DUPLICADO'    : 'Error: No se pueden agregar productos duplicados en la misma fabricación.',
+
+    'FACTURAS_EXITO_AGREGAR'                  : 'Factura agregada exitosamente.',
+    'FACTURAS_ERROR_PRODUCTO_DUPLICADO'       : 'Error: No se pueden agregar productos duplicados en la misma factura.',
+    'FACTURAS_ERROR_CANTIDAD'                 : 'Error: La cantidad debe ser un número positivo.',
+    'FACTURAS_ERROR_PRECIO'                   : 'Error: El precio debe ser un número positivo.',
 }
 
 UNIDADES = {
@@ -338,6 +343,20 @@ class Stock:
         
         return Mensajes['STOCK_EXITO_MODIFICAR']
 
+    def Facturar(self, id_items, cantidades):
+        for i in range(len(id_items)):
+            if not Validar_Item(self.DB, 'Producto', id_items[i]):
+                return Mensajes['STOCK_ERROR_ITEM']
+
+            if not Validar_Cantidad(cantidades[i], minimo=0):
+                return Mensajes['STOCK_ERROR_CANTIDAD']
+        
+            self.DB.execute(f'UPDATE stock SET cantidad = cantidad - ? WHERE id_item = ? AND tipo_item = "Producto"', (cantidades[i], id_items[i]))
+        
+        self.DB.commit()
+        
+        return 'Stock actualizado exitosamente.'
+
 class Fabricaciones:
     def __init__(self, DB):
         self.DB = DB
@@ -460,3 +479,23 @@ class Facturas:
             return 1
         
         return resultado
+
+    def Agregar(self, fecha, cliente, productos, cantidades, precios):
+        if len(productos) != len(set(productos)):
+            return Mensajes['FACTURAS_ERROR_PRODUCTO_DUPLICADO']
+
+        for cantidad in cantidades:
+            if not Validar_Cantidad(cantidad):
+                return Mensajes['FACTURAS_ERROR_CANTIDAD']
+
+        for precio in precios:
+            if not Validar_Cantidad(precio):
+                return Mensajes['FACTURAS_ERROR_PRECIO']
+
+        id_encabezado = self.DB.execute('INSERT INTO facturas_encabezado (fecha, cliente) VALUES (?, ?)', (fecha, cliente,)).lastrowid
+
+        for i in range(len(productos)):
+            self.DB.execute(f'INSERT INTO facturas_detalle (id_encabezado, id_producto, cantidad, precio) VALUES ({id_encabezado}, {productos[i]}, {cantidades[i]}, {precios[i]})')
+
+        self.DB.commit()
+        return Mensajes['FACTURAS_EXITO_AGREGAR']

@@ -218,6 +218,7 @@ def Fabricaciones_Agregar():
         Stock = fun.Stock(Get_DB())
 
         # BUG: El Stock se agrega aunque falle la Fabricación
+        # TODO: El Stock de los Componentes debería disminuir
 
         return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas), Stock.Agregar_Fabricacion(productos, cantidades)])
 
@@ -229,6 +230,24 @@ FACTURAS
 
 @APP.route('/facturas/', methods=['GET'])
 def Facturas_Consultar():
+    return render_template('/facturas.html')
+
+@APP.route('/facturas/agregar', methods=['POST'])
+def Facturas_Agregar():
+    if request.method == 'POST':
+        fecha = request.form['agregar_fecha']
+        cliente = request.form['agregar_cliente']
+        productos = request.form.getlist('agregar_producto')
+        cantidades = request.form.getlist('agregar_cantidad')
+        precios = request.form.getlist('agregar_precio')
+
+        Facturas = fun.Facturas(Get_DB())
+        Stock = fun.Stock(Get_DB())
+
+        # TODO: El Stock debería disminuir
+
+        return render_template('/facturas.html', mensajes=[Facturas.Agregar(fecha, cliente, productos, cantidades, precios), Stock.Facturar(productos, cantidades)])
+
     return render_template('/facturas.html')
 
 with APP.app_context():
