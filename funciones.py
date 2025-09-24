@@ -409,3 +409,54 @@ class Fabricaciones:
         self.DB.commit()
         
         return Mensajes['FABRICACION_EXITO_MODIFICAR']
+
+class Facturas:
+    def __init__(self, DB):
+        self.DB = DB
+
+    def Consultar(self):
+        consulta = '''\
+            SELECT
+                cab.id,
+                cab.fecha,
+                cab.cliente,
+                GROUP_CONCAT(
+                det.id_producto || ',' ||
+                det.cantidad || ',' ||
+                det.precio
+                , ';')
+            FROM facturas_encabezado cab
+            JOIN facturas_detalle det ON det.id_encabezado = cab.id
+            GROUP BY cab.id'''
+
+        facturas = self.DB.execute(consulta).fetchall()
+        facturasLista = {}
+
+        for id_factura, fecha, cliente, productos in facturas:
+            factura = {
+                'fecha': fecha,
+                'cliente': cliente,
+                'productos': []
+            }
+
+            for producto in productos.split(';'):
+                id_producto, cantidad, precio = producto.split(',')
+                factura['productos'].append({
+                    'id_producto': int(id_producto),
+                    'cantidad': int(cantidad),
+                    'precio': float(precio)
+                })
+            facturasLista[id_factura] = factura
+            
+
+        print(facturasLista)
+        return facturasLista
+
+    def Consultar_Siguiente(self):
+        try:
+            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "facturas_encabezado"').fetchone()[0]
+
+        except TypeError:
+            return 1
+        
+        return resultado

@@ -41,6 +41,7 @@ def Inyectar_Datos():
     Componentes_Por_Producto = fun.Componentes_Por_Producto(DB)
     Stock = fun.Stock(DB)
     Fabricaciones = fun.Fabricaciones(DB)
+    Facturas = fun.Facturas(DB)
     
     return dict(
         productosLista = Productos.Consultar(),
@@ -60,7 +61,10 @@ def Inyectar_Datos():
 
         fabricacionesLista = Fabricaciones.Consultar(),
         fabricacionSiguiente = Fabricaciones.Consultar_Siguiente_ID(),
-        fechaHoy = datetime.datetime.now().strftime('%Y-%m-%d')
+        fechaHoy = datetime.datetime.now().strftime('%Y-%m-%d'),
+
+        facturas = Facturas.Consultar(),
+        facturaSiguiente = Facturas.Consultar_Siguiente(),
     )
 
 '''
@@ -213,9 +217,19 @@ def Fabricaciones_Agregar():
         Fabricaciones = fun.Fabricaciones(Get_DB())
         Stock = fun.Stock(Get_DB())
 
+        # BUG: El Stock se agrega aunque falle la Fabricación
+
         return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas), Stock.Agregar_Fabricacion(productos, cantidades)])
 
     return render_template('/fabricaciones.html')
+
+'''
+FACTURAS
+'''
+
+@APP.route('/facturas/', methods=['GET'])
+def Facturas_Consultar():
+    return render_template('/facturas.html')
 
 with APP.app_context():
     Init_DB()

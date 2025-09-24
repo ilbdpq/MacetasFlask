@@ -8,48 +8,6 @@
     <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
 </head>
 
-<!-- <body>
-    <div id="container">
-        {% include 'aside.html' %}
-
-        <main>
-            <legend>Fabricaciones</legend>
-            {% if fabricacionesLista %}
-                {% for fecha, productos in fabricacionesLista.items() %}
-                    <table class="fabricacion">
-                        <thead>
-                            <th style="width: 10%; text-align: center;">{{ fecha }}</th>
-                            <th style="width: 30%;">Producto</th>
-                            <th style="width: 20%;">Cantidad</th>
-                            <th style="width: 10%;">Precio de costo</th>
-                            <th style="width: 10%;">Precio de venta</th>
-                            <th style="width: 20%;">Acción</th>
-                        </thead>
-
-                        <tbody>
-                            {% for producto, valores in productos.items() %}
-                                <tr>
-                                    <td><input type="text" readonly></td>
-                                    <td><input type="text" readonly value="{{productosFormateados.get(producto)}}"></td>
-                                    {% for valor in valores %}
-                                        <td><input type="text" readonly value="{{ valor }}"></td>
-                                    {% endfor %}
-                                    <td class="ultimaColumna">
-                                        <div>
-                                            <input type="button" value="Guardar">
-                                            <input type="button" value="Eliminar">
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endfor %}
-            {% endif %}
-        </main>
-    </div>
-</body> -->
-
 <body>
     <div class="window">
         {% include 'header.html' %}

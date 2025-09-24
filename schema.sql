@@ -251,6 +251,20 @@ INSERT INTO fabricaciones_detalle (id_encabezado, id_producto, cantidad, precio_
     (3, 17, 20, 6.00 ,12.00 ),  -- Plato Rectangulo 20x40cm
     (3, 18, 30, 5.00 ,10.00 );  -- Plato Circulo 20cm
 
+-- Insertar datos de ejemplo en FACTURAS
+INSERT INTO facturas_encabezado (fecha, cliente) VALUES
+    ('2025-09-06', 'Juan Pérez'),
+    ('2025-09-13', 'María Gómez'),
+    ('2025-09-20', 'Carlos López');
+
+INSERT INTO facturas_detalle (id_encabezado, id_producto, cantidad, precio) VALUES
+    (1, 1 , 2 , 30.00),  -- Maceta Cubo
+    (1, 15, 2 , 10.00),  -- Plato Cuadrado 20cm
+    (2, 8 , 1 , 50.00),  -- Maceta Rectangular
+    (2, 17, 1 , 12.00),  -- Plato Rectangulo 20x40cm
+    (3, 13, 3 , 50.00),  -- Maceta Colgante Cadena
+    (3, 18, 3 , 10.00);  -- Plato Circulo 20cm
+
 -- Crear índices para mejorar el rendimiento de las consultas
 CREATE INDEX idx_productos_tipo ON productos(tipo);
 CREATE INDEX idx_componentes_nombre ON componentes(nombre);
