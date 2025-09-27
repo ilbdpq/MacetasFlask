@@ -1,7 +1,13 @@
 import re
 import sqlite3
+import datetime
 
 Mensajes = {
+    'USUARIO_EXITO_AGREGAR'                   : 'Usuario agregado exitosamente.',
+    'USUARIO_EXITO_MODIFICAR'                   : 'Usuario modificado exitosamente.',
+    'USUARIO_EXITO_ELIMINAR'                   : 'Usuario eliminado exitosamente.',
+    'USUARIO_ERROR_USERNAME'                   : 'Error: Usuario duplicado.',
+    
     'PRODUCTO_EXITO_AGREGAR'                  : 'Producto agregado exitosamente.',
     'PRODUCTO_EXITO_MODIFICAR'                : 'Producto modificado exitosamente.',
     'PRODUCTO_EXITO_ELIMINAR'                 : 'Producto eliminado exitosamente.',
@@ -48,6 +54,9 @@ UNIDADES = {
     'l'  : 'Litro (l)',
     'u'  : 'Unidad (u)'
 }
+
+def Tiempo():
+    return datetime.datetime.now().strftime("%H:%M:%S")
 
 def Validar_Medidas(medidas):
     # 1 a 4 dígitos x 1 a 4 dígitos x 1 a 4 dígitos (10x20x30)
@@ -116,6 +125,78 @@ def Validar_Stock(DB, tipo_item, id_item):
     
     return False
 
+class Usuario:
+    def __init__(self, DB):
+        self.DB = DB
+        self.CUR = self.DB.cursor()
+
+    def getAll(self):
+        self.CUR.execute('SELECT * FROM usuarios')
+        query = self.CUR.fetchall()
+        usuarios = {}
+
+        for id, username, password, nombres, rol in query:
+            usuario = {
+                'username' : username,
+                'password' : password,
+                'nombres' : nombres,
+                'rol' : rol
+            }
+            usuarios[id] = usuario
+        
+        return usuarios
+
+    def getRoles(self):
+        return ['Administrador', 'Gerente', 'Encargado', 'Operario']
+
+    def getRole(self, username, password):
+        self.CUR.execute('''SELECT rol FROM usuarios WHERE username = ? AND password = ?''',
+                         (username, password))
+        return self.CUR.fetchone()[0]
+
+    def getNext(self):
+        try:
+            query = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "usuarios"').fetchone()[0]
+
+        except TypeError:
+            return 1
+        
+        return query
+
+    def get(self, username):
+        self.CUR.execute('SELECT FROM usuarios WHERE username = ?',
+                         (username))
+        
+        return self.CUR.fetchone()
+
+    def add(self, username, password, nombres, rol):
+        try:
+            self.CUR.execute('''INSERT INTO usuarios (username, password, nombres, rol)
+                             VALUES (?, ?, ?, ?)''', (username, password, nombres, rol))
+            self.DB.commit()
+
+            return Mensajes['USUARIO_EXITO_AGREGAR']
+
+        except sqlite3.IntegrityError:
+            return Mensajes['USUARIO_ERROR_USERNAME']
+
+    def set(self, id, username, password, nombres, rol):
+        try:
+            self.CUR.execute('''UPDATE usuarios SET password = ?, nombres = ?, rol = ? WHERE id = ?''',
+                             (password, nombres, rol, id))
+            self.DB.commit()
+
+            return Mensajes['USUARIO_EXITO_MODIFICAR']
+
+        except sqlite3.IntegrityError:
+            return Mensajes['USUARIO_ERROR_USERNAME']
+
+    def delete(self, id):
+        self.CUR.execute('''DELETE FROM usuarios WHERE id = ?''',
+                         (id))
+        self.DB.commit()
+
+        return Mensajes['USUARIO_EXITO_ELIMINAR']
 
 class Productos:
     def __init__(self, DB):

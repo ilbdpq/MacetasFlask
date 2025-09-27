@@ -63,11 +63,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th colspan="3" scope="colgroup">
+                        <th colspan="1">
+                            <div style="justify-content: space-between;">
+                                <div style="width: 100%; justify-content: flex-start;">
+                                    <label for="">#</label>
+                                    <input type="text" name="id_factura" readonly value="{{ id_factura }}">
+                                </div>
+    
+                                <div style="width: 100%; justify-content: flex-end;">
+                                    <label for="fecha">Fecha:</label>
+                                    <input type="date" name="fecha" value="{{ factura['fecha'] }}" readonly>
+                                </div>
+                            </div>
+                        </th>
+                        
+                        <th colspan="2">
                             <div>
-                                <p style="text-align: left;">#{{ id_factura }}</p>
-                                <p style="text-align: center;">Fecha: {{ factura['fecha'] }}</p>
-                                <p style="text-align: right;">Cliente: {{ factura['cliente'] }}</p>
+                                <label for="agregar_cliente">Cliente: </label>
+                                <input type="text" name="agregar_cliente" value="{{ factura['cliente'] }}" readonly>
                             </div>
                         </th>
                     </tr>
@@ -91,56 +104,58 @@
             </table>
         {% endfor %}
 
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="3" scope="colgroup">
-                        <div>
-                            <p style="text-align: left;">#{{ facturaSiguiente }}</p>
-                            <p style="text-align: center;">
-                                <label for="agregar_fecha">Fecha: </label>
-                                <input type="date" name="agregar_fecha" value="fechaHoy">
-                            </p>
-                            <p style="text-align: right;">
-                                <label for="agregar_cliente">Cliente: </label>
-                                <input type="text" name="agregar_cliente">
-                            </p>
-                        </div>
-                    </th>
-                </tr>
-                <tr>
-                    <th scope="col" style="width: 70%;">Producto</th>
-                    <th scope="col" style="width: 15%;">Cantidad</th>
-                    <th scope="col" style="width: 15%;">Precio</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr class="agregarFila">
-                    <td style="width: 70%;">
-                        <div style="display: flex;">
-                            <input type="button" onclick="agregarFila()" value="+" style="width: 10%;">
-                            <select name="agregar_producto" style="width: 90%;">
-                                {% for id, texto in productosFormateados.items() %}
-                                    <option value="{{ id }}">{{ texto }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </td>
-                    <td style="width: 15%;">
-                        <input type="number" name="agregar_cantidad" style="height: 100%;">
-                    </td>
-                    <td style="width: 15%;">
-                        <input type="number" name="agregar_precio" style="height: 100%;">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="3">
-                        <input type="submit" value="Subir" style="width: 100%;"">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <form action="/facturas/agregar" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="3" scope="colgroup">
+                            <div>
+                                <p style="text-align: left;">#{{ facturaSiguiente }}</p>
+                                <p style="text-align: center;">
+                                    <label for="agregar_fecha">Fecha: </label>
+                                    <input type="date" name="agregar_fecha" value="fechaHoy">
+                                </p>
+                                <p style="text-align: right;">
+                                    <label for="agregar_cliente">Cliente: </label>
+                                    <input type="text" name="agregar_cliente">
+                                </p>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th scope="col" style="width: 70%;">Producto</th>
+                        <th scope="col" style="width: 15%;">Cantidad</th>
+                        <th scope="col" style="width: 15%;">Precio</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    <tr class="agregarFila">
+                        <td style="width: 70%;">
+                            <div style="display: flex;">
+                                <input type="button" onclick="agregarFila()" value="+" style="width: 10%;">
+                                <select name="agregar_producto" style="width: 90%;">
+                                    {% for id, texto in productosFormateados.items() %}
+                                        <option value="{{ id }}">{{ texto }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </td>
+                        <td style="width: 15%;">
+                            <input type="number" name="agregar_cantidad" style="height: 100%;">
+                        </td>
+                        <td style="width: 15%;">
+                            <input type="number" name="agregar_precio" style="height: 100%;">
+                        </td>
+                    </tr>
+    
+                    <tr>
+                        <td colspan="3">
+                            <input type="submit" value="Subir" style="width: 100%;"">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
     </main>
 </body>

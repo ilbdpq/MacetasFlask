@@ -1,0 +1,254 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+html {
+    --color-celeste: #008080;
+    --color-azul: #000080;
+    --color-negro: #111;
+    --color-grisoscuro: #808080;
+    --color-gris: #BBB;
+    --color-blanco: #EEE;
+    --borde-raised: 2px outset var(--color-blanco);
+    --borde-sunken: 2px inset var(--color-blanco);
+    --borde-grooved: 4px groove var(--color-blanco);
+    --borde-ridged: 4px ridge var(--color-blanco);
+    --fuente-grande: 1.5rem;
+
+    background-color: var(--color-gris);
+    min-height: 100dvh;
+}
+
+.raised {
+    border: var(--borde-raised);
+    background-color: var(--color-gris);
+}
+
+.sunken {
+    border: var(--borde-sunken);
+    background-color: var(--color-gris);
+}
+
+.ridged {
+    border: var(--borde-ridged);
+    background-color: var(--color-gris);
+}
+
+body {
+    padding: 0.5rem;
+    display: grid;
+    grid-template-areas:
+    'header header'
+    'aside main';
+    grid-template-columns: 12rem 1fr;
+    grid-template-rows: max-content auto;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
+}
+
+header {
+    grid-area: header;
+    margin: -0.5rem -0.5rem 0 -0.5rem;
+    background: linear-gradient(to right, var(--color-azul), var(--color-celeste));
+    color: var(--color-blanco);
+    font-size: var(--fuente-grande);
+    padding: 0.5rem;
+}
+    header a {
+        background-image: linear-gradient(to right, var(--color-azul), var(--color-celeste));
+        filter: invert(100%);
+        color: transparent;
+        background-clip: text;
+    }
+
+aside {
+    grid-area: aside;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+
+nav {
+    padding: 0.5rem;
+    border: var(--borde-ridged);
+    min-width: 8rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+    nav summary {
+        cursor: pointer;
+        user-select: none;
+        padding: 0.25rem;
+    }
+    nav summary::marker {
+        content: none;
+    }
+    nav details {
+        border: var(--borde-raised);
+        background-color: var(--color-gris);
+    }
+    nav details[open] {
+        border: var(--borde-sunken);
+        background-color: var(--color-blanco);
+    }
+    nav a {
+        display: block;
+        padding: 0.25rem;
+        background-color: var(--color-gris);
+        border: var(--borde-raised);
+        text-decoration: none;
+        color: var(--color-negro);
+    }
+#mensajes {
+    padding: 0.5rem;
+    border: var(--borde-ridged);
+    display: flex;
+    flex-direction: column;
+}
+#mensajes legend {
+    margin-bottom: 0.25rem;
+}
+@keyframes mensaje-flash {
+    0% {
+        background: var(--color-blanco);
+    }
+    80% {
+        background: inherit;
+    }
+}
+.mensaje {
+    border: var(--borde-sunken);
+    background-color: var(--color-gris);
+    padding: 0.25rem;
+    animation: mensaje-flash 10s;
+}
+
+main {
+    grid-area: main;
+    padding: 0.5rem;
+    display: flex;
+    row-gap: 0.5rem;
+    flex-direction: column;
+    border: var(--borde-ridged);
+}
+
+legend {
+    font-size: var(--fuente-grande);
+}
+
+table {
+    width: 100%;
+    border-spacing: 0;
+}
+    table * {
+        font-family: monospace;
+        font-size: 1rem;
+    }
+    table div {
+        display: flex;
+    }
+    table th {
+        border: var(--borde-raised);
+        font-weight: normal;
+        height: 1.5rem;
+        padding: 0 2px;
+    }
+    table th.id {
+        width: 3rem;
+    }
+    table th.id input {
+        text-align: center;
+    }
+    table td {
+        border: var(--borde-sunken);
+        background-color: var(--color-blanco);
+        height: 1.5rem;
+        padding: 0 0.25rem;
+    }
+    table td:focus-within {
+        background-color: var(--color-azul);
+    }
+    table .columnaAcciones {
+        border: unset;
+        padding: 0;
+    }
+    table .columnaAcciones span {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+    }
+    table input {
+        width: 100%;
+        outline: none;
+    }
+    table td:focus-within input {
+        color: var(--color-blanco);
+    }
+    table input[type=text] {
+        background: none;
+        border: none;
+    }
+    table input[type=button], table input[type=submit] {
+        background: var(--color-gris);
+        border: var(--borde-raised);
+    }
+    table input[type=button]:active, input[type=submit]:active {
+        border: var(--borde-sunken);
+    }
+    table select {
+        background: none;
+        border: none;
+        width: 100%;
+        outline: none;
+    }
+    table td:focus-within select {
+        background-color: var(--color-azul);
+        color: var(--color-blanco);
+    }
+
+#login {
+    grid-template-areas:
+    'header'
+    'main';
+    grid-template-columns: 1fr;
+}
+    #login main {
+        width: 33%;
+        margin: auto;
+    }
+    #login form {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        row-gap: 1rem;
+    }
+    #login div {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        justify-content: center;
+    }
+    #login input:read-write {
+        border: var(--borde-sunken);
+        outline: none;
+        height: 1.5rem;
+        width: auto;
+    }
+    #login input:read-write:focus {
+        background-color: var(--color-azul);
+        color: var(--color-blanco);
+    }
+    #login input[type=submit] {
+        background: var(--color-gris);
+        border: var(--borde-raised);
+        outline: none;
+        height: 1.5rem;
+        width: 66%;
+        margin: auto;
+    }
+    #login input[type=submit]:active {
+        border: var(--borde-sunken);
+    }

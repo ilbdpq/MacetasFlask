@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, session
 from flask import request
 from flask import g
 import datetime
@@ -36,43 +36,82 @@ def Init_DB():
 @APP.context_processor
 def Inyectar_Datos():
     DB = Get_DB()
-    Productos = fun.Productos(DB)
-    Componentes = fun.Componentes(DB)
-    Componentes_Por_Producto = fun.Componentes_Por_Producto(DB)
-    Stock = fun.Stock(DB)
-    Fabricaciones = fun.Fabricaciones(DB)
-    Facturas = fun.Facturas(DB)
+    Usuario = fun.Usuario(DB)
     
     return dict(
-        productosLista = Productos.Consultar(),
-        productosTipos = Productos.Consultar_Tipos(),
-        productoSiguiente = Productos.Consultar_Siguiente_ID(),
-        productosFormateados = Productos.Consultar_Formateado(),
-
-        componentesLista = Componentes.Consultar(),
-        componenteSiguiente = Componentes.Consultar_Siguiente_ID(),
-        componentesFormateados = Componentes.Consultar_Formateado(),
-        componentesUnidades = fun.UNIDADES,
-        
-        componentesPorProductoLista = Componentes_Por_Producto.Consultar(),
-        componentesPorProductoSiguiente = Componentes_Por_Producto.Consultar_Siguiente_ID(),
-        
-        stockLista = Stock.Consultar(),
-
-        fabricacionesLista = Fabricaciones.Consultar(),
-        fabricacionSiguiente = Fabricaciones.Consultar_Siguiente_ID(),
-        fechaHoy = datetime.datetime.now().strftime('%Y-%m-%d'),
-
-        facturas = Facturas.Consultar(),
-        facturaSiguiente = Facturas.Consultar_Siguiente(),
+        roles = Usuario.getRoles(),
+        usuarios = Usuario.getAll(),
+        usuario_siguiente = Usuario.getNext()
     )
-
+    
 '''
 Página principal
 '''
 @APP.route('/')
 def Index():
-    return render_template('index.html')
+    try:
+        session['sesion']
+
+    except KeyError:
+        return redirect(url_for('Template_Login'))
+
+    else:
+        return render_template('index.html')
+
+'''
+Login
+'''
+@APP.route('/login')
+def Template_Login():
+    return render_template('/login.html')
+
+@APP.route('/login/', methods=['POST'])
+def Login():
+    username = request.form['username']
+    password = request.form['password']
+
+    Usuario = fun.Usuario(Get_DB())
+    if Usuario.getRole(username, password) == 'Administrador':
+        session['sesion'] = 'admin'
+        session.permanent = True
+        return redirect(url_for('Index'))
+
+    else:
+        return redirect(url_for('Template_Login'))
+
+'''
+Usuarios
+'''
+@APP.route('/usuarios/', methods=['GET'])
+def Template_Usuarios():    
+    try:
+        mensajes = session['mensajes']
+
+    except KeyError:
+        mensajes = []
+        
+    return render_template('/usuarios.html', mensajes=mensajes)
+
+@APP.route('/usuarios/modificar/', methods=['POST'])
+def Modificar_Usuario():
+    id = request.form['id']
+    username = request.form['username']
+    password = request.form['password']
+    nombres = request.form['nombres']
+    rol = request.form['rol']
+
+    Usuario = fun.Usuario(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Usuario.set(id=id, username=username, password=password, nombres=nombres, rol=rol)]
+    return redirect(url_for('Template_Usuarios'))
+        
+@APP.route('/usuarios/eliminar/', methods=['POST'])
+def Eliminar_Usuario():
+    id = request.form['id']
+
+    Usuario = fun.Usuario(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Usuario.delete(id=id)]
+
+    return redirect(url_for('Template_Usuarios'))
 
 '''
 Productos
@@ -230,7 +269,7 @@ FACTURAS
 
 @APP.route('/facturas/', methods=['GET'])
 def Facturas_Consultar():
-    return render_template('/facturas.html')
+    return render_template('/facturas_2.html')
 
 @APP.route('/facturas/agregar', methods=['POST'])
 def Facturas_Agregar():
@@ -254,5 +293,6 @@ with APP.app_context():
     Init_DB()
 
 if __name__ == '__main__':
-    # APP.config['SECRET_KEY'] = 'bdpq'
+    APP.config['SECRET_KEY'] = 'bdpq'
+    APP.config['PERMANENT_SESSION_LIFETIME'] =  datetime.timedelta(minutes=30)
     APP.run(debug=True)

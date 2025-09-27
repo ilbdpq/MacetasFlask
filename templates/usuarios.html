@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    {% include 'aside.html' %}
+
+    <main>
+        <legend>Usuarios</legend>
+        <table>
+            <thead>
+                <tr>
+                    <th class="id">ID</th>
+                    <th>Nombre de usuario</th>
+                    <th>Contraseña</th>
+                    <th>Apellido, Nombre</th>
+                    <th>Rol</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if usuarios %}
+                    {% for id, usuario in usuarios.items() %}
+                        <form action="{{ url_for('Modificar_Usuario') }}" method="post">
+                            <tr>
+                                <th class="id">
+                                    <input type="text" name="id" value="{{ id }}">
+                                </th>
+                                <td>
+                                    <input type="text" name="username" value="{{ usuario['username'] }}">
+                                </td>
+                                <td>
+                                    <input type="text" name="password" value="{{ usuario['password'] }}">
+                                </td>
+                                <td>
+                                    <input type="text" name="nombres" value="{{ usuario['nombres'] }}">
+                                </td>
+                                <td>
+                                    <select name="rol">
+                                        {% for rol in roles %}
+                                            {% if rol == usuario['rol'] %}
+                                                <option selected value="{{ rol }}">{{ rol }}</option>
+                                            {% else %}
+                                                <option value="{{ rol }}">{{ rol }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <th class="columnaAcciones">
+                                    <span>
+                                        <input type="submit" value="Modificar">
+                                        <input type="submit" value="Eliminar" formaction="{{ url_for('Eliminar_Usuario') }}">
+                                    </span>
+                                </th>
+                            </tr>
+                        </form>
+                    {% endfor %}
+                {% endif %}
+                <tr>
+                    <th>
+                        {{ usuario_siguiente }}
+                    </th>
+                    <td>
+                        <input type="text" name="">
+                    </td>
+                    <td>
+                        <input type="text" name="">
+                    </td>
+                    <td>
+                        <input type="text" name="">
+                    </td>
+                    <td>
+                        <input type="text" name="">
+                    </td>
+                    <th class="columnaAcciones">
+                        <span>
+                            <input type="button" value="Agregar">
+                        </span>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

@@ -1,58 +1,36 @@
-<header>
-    <a href="/">Macetas S.A.</a>
-</header>
+<aside>
+    <nav>
+        <legend>Navegar</legend>
+        <details open>
+            <summary>Manejo de datos</summary>
+            <a href="{{ url_for('Template_Usuarios') }}">Usuarios</a>
+            <a href="./productos.html">Productos</a>
+            <a href="./componentes.html">Componentes</a>
+            <a href="/stock">Stock</a>
+            <a href="/fabricaciones">Fabricaciones</a>
+            <a href="/facturas">Facturas</a>
+        </details>
 
-<nav>
-    <legend>Navegar</legend>
-    <div>
-        <ul>
-            <li>
-                <details open>
-                    <summary>Cargar datos</summary>
-                    <ul>
-                        <li><a href="/productos/">Productos</a></li>
-                        <li><a href="/componentes/">Componentes</a></li>
-                        <li><a href="/stock/">Stock</a></li>
-                        <li><a href="/fabricaciones/">Fabricaciones</a></li>
-                        <li>Facturas</li>
-                    </ul>
-                </details>
-            </li>
-            <li>
-                <details closed>
-                    <summary>Recuperar datos</summary>
-                    <ul>
-                        <li><a href="/productos/recuperar">Productos</a></li>
-                        <li><a href="/componentes/recuperar">Componentes</a></li>
-                        <li><a href="/stock/recuperar">Stock</a></li>
-                        <li><a href="/fabricaciones/recuperar">Fabricaciones</a></li>
-                        <li><a href="/facturas/recuperar">Facturas</a></li>
-                    </ul>
-                </details>
-            </li>
-            <li>
-                <summary>Informes</summary>
-            </li>
-        </ul>
-    </div>
-</nav>
+        <details open>
+            <summary>Informes</summary>
+            <a href="">Productos</a>
+            <a href="">Componentes</a>
+            <a href="">Stock</a>
+            <a href="">Fabricaciones</a>
+            <a href="">Facturas</a>
+        </details>
+    </nav>
 
-{% if not productosLista %}
-<div class="mensaje">
-    No hay productos
-</div>
-{% endif %}
+    {% if mensajes %}
+        <div id="mensajes">
+        <legend>Mensajes</legend>
 
-{% if not componentesLista %}
-    <div class="mensaje">
-        No hay componentes
-    </div>
-{% endif %}
+        {% for mensaje in mensajes %}                
+            <span class="mensaje">
+                {{ mensaje }}
+            </span>
+        {% endfor %}
 
-{% if mensajes %}
-    {% for mensaje in mensajes %}
-        <div class="mensaje">
-            {{mensaje}}
         </div>
-    {% endfor %}
-{% endif %}
+    {% endif %}
+</aside>

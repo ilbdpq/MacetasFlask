@@ -1,36 +1,19 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Practico</title>
-    <link rel="stylesheet" href="https://unpkg.com/98.css">
-    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <div class="window">
-        {% include 'header.html' %}
+    {% include 'header.html' %}
+    {% include 'aside.html'   %}
 
-        <div class="window-body" id="container">
-            <div id="aside">
-                {% include 'nav.html' %}
-    
-                {% if mensaje %}
-                    <div class="field-border-disabled" id="mensaje">
-                        {{mensaje}}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div id="main">
-                <legend>Novedades</legend>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum odit corrupti veniam voluptates repellendus itaque at fuga illo. Numquam distinctio accusamus velit fuga odit autem nesciunt qui, tempora omnis delectus.</p>
+    <main>
+        Bienvenido!
+    </main>
 
-                <p>WIP</p>
-            </div>
-        </div>
-    </div>
 </body>
-
-</html>
