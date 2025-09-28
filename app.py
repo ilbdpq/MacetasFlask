@@ -37,11 +37,15 @@ def Init_DB():
 def Inyectar_Datos():
     DB = Get_DB()
     Usuario = fun.Usuario(DB)
+    Producto = fun.Producto(DB)
     
     return dict(
         roles = Usuario.getRoles(),
         usuarios = Usuario.getAll(),
-        usuario_siguiente = Usuario.getNext()
+        usuario_siguiente = Usuario.getNext(),
+
+        productos_habilitados = Producto.getEnabled(),
+        producto_siguiente = Producto.getNext(),
     )
     
 '''
@@ -56,7 +60,11 @@ def Index():
         return redirect(url_for('Template_Login'))
 
     else:
-        return render_template('index.html')
+        if session['sesion'] == 'Administrador':
+            return render_template('index.html')
+
+        else:
+            return redirect(url_for('Template_Login'))
 
 '''
 Login
@@ -72,12 +80,18 @@ def Login():
 
     Usuario = fun.Usuario(Get_DB())
     if Usuario.getRole(username, password) == 'Administrador':
-        session['sesion'] = 'admin'
+        session['sesion'] = 'Administrador'
+        session['mensajes'] = []
         session.permanent = True
         return redirect(url_for('Index'))
 
     else:
         return redirect(url_for('Template_Login'))
+
+@APP.route('/logout', methods=['POST'])
+def Logout():
+    session.pop('sesion', None)
+    return redirect(url_for('Template_Login'))
 
 '''
 Usuarios
@@ -85,12 +99,12 @@ Usuarios
 @APP.route('/usuarios/', methods=['GET'])
 def Template_Usuarios():    
     try:
-        mensajes = session['mensajes']
+        session['mensajes']
 
     except KeyError:
-        mensajes = []
+        session['mensajes'] = []
         
-    return render_template('/usuarios.html', mensajes=mensajes)
+    return render_template('/usuarios.html', mensajes=session['mensajes'])
 
 @APP.route('/usuarios/modificar/', methods=['POST'])
 def Modificar_Usuario():
@@ -113,48 +127,66 @@ def Eliminar_Usuario():
 
     return redirect(url_for('Template_Usuarios'))
 
+@APP.route('/usuarios/agregar/', methods=['POST'])
+def Agregar_Usuario():
+    username = request.form['username']
+    password = request.form['password']
+    nombres = request.form['nombres']
+    rol = request.form['rol']
+
+    Usuario = fun.Usuario(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Usuario.add(username=username, password=password, nombres=nombres, rol=rol)]
+
+    return redirect(url_for('Template_Usuarios'))
+
 '''
 Productos
 '''
 @APP.route('/productos/', methods=['GET'])
-def Productos_Consultar():
-    return render_template('/productos.html')
+def Template_Productos():    
+    try:
+        session['mensajes']
 
-@APP.route('/productos/agregar', methods=['GET', 'POST'])
-def Productos_Agregar():
-    if request.method == 'POST':
-        id = request.form['id_agregar']
-        tipo = request.form['tipo_agregar']
-        nombre = request.form['nombre_agregar']
-        modelo = request.form['modelo_agregar']
-        medidas = request.form['medidas_agregar']
+    except KeyError:
+        session['mensajes'] = []
+        
+    return render_template('/productos.html', mensajes=session['mensajes'])
 
-        Productos = fun.Productos(Get_DB())
-        Stock = fun.Stock(Get_DB())
+@APP.route('/productos/modificar/', methods=['POST'])
+def Modificar_Producto():
+    id = request.form['id']
+    tipo = request.form['tipo']
+    nombre = request.form['nombre']
+    modelo = request.form['modelo']
+    estilo = request.form['estilo']
+    medidas = request.form['medidas']
+    precio_venta = request.form['precio_venta']
 
-        return render_template('/productos.html', mensajes=[Productos.Agregar(tipo, nombre, modelo, medidas), Stock.Agregar(id, 'Producto', 0)])
+    Producto = fun.Producto(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Producto.set(id, tipo, nombre, modelo, estilo, medidas, precio_venta)]
 
-    return render_template('/productos.html')
+    return redirect(url_for('Template_Productos'))
 
-@APP.route('/productos/modificar', methods=['POST'])
-def Productos_Modificar():
-    id = request.form['id_modificar']
-    tipo = request.form['tipo_modificar']
-    nombre = request.form['nombre_modificar']
-    modelo = request.form['modelo_modificar']
-    medidas = request.form['medidas_modificar']
+@APP.route('/productos/eliminar/', methods=['POST'])
+def Eliminar_Producto():
+    id = request.form['id']
 
-    Productos = fun.Productos(Get_DB())
-
-    return render_template('/productos.html', mensajes=[Productos.Modificar(id, tipo, nombre, modelo, medidas)])
-
-@APP.route('/productos/eliminar', methods=['POST'])
-def Productos_Eliminar():
-    id = request.form['id_eliminar']
+    Producto = fun.Producto(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Producto.delete(id=id)]
     
-    Productos = fun.Productos(Get_DB())
+    return redirect(url_for('Template_Productos'))
 
-    return render_template('/productos.html', mensajes=[Productos.Eliminar(id)])
+@APP.route('/productos/agregar/', methods=['POST'])
+def Agregar_Producto():
+    tipo = request.form['tipo']
+    nombre = request.form['nombre']
+    modelo = request.form['modelo']
+    estilo = request.form['estilo']
+    medidas = request.form['medidas']
+    precio_venta = request.form['precio_venta']
+
+    Producto = fun.Producto(Get_DB())
+    session['mensajes'] += [fun.Tiempo(), Producto.add(tipo, nombre, modelo, estilo, medidas, precio_venta)]
 
 '''
 Componentes

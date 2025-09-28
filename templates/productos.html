@@ -1,100 +1,100 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Practico</title>
-    <link rel="stylesheet" href="https://unpkg.com/98.css">
-    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <div class="window">
-        {% include 'header.html' %}
+    {% include 'header.html' %}
+    {% include 'aside.html' %}
 
-        <div class="window-body" id="container">
-            <div id="aside">
-                {% include 'nav.html' %}
-                {% include 'mensajes.html' %}
-            </div>
-
-            <div id="main">
-                <legend>Productos</legend>
-                <div class="sunken-panel">
-                    <table class="interactive">
-                        <thead>
-                            <th class="primerColumna">ID</th>
-                            <th>Tipo</th>
-                            <th>Nombre</th>
-                            <th>Modelo</th>
-                            <th>Medidas</th>
-                            <th class="ultimaColumna">Acción</th>
-                        </thead>
-                        {% if productosLista %}
-                        {% for producto in productosLista %}
+    <main>
+        <legend>Productos</legend>
+        <table>
+            <thead>
+                <tr>
+                    <th class="id">ID</th>
+                    <th>Tipo</th>
+                    <th>Nombre</th>
+                    <th>Modelo</th>
+                    <th>Estilo</th>
+                    <th>Medidas</th>
+                    <th>Precio</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if productos_habilitados %}
+                    {% for id, producto in productos_habilitados.items() %}
                         <tr>
-                            <form action="/productos/modificar" method="post">
-                                <td class="primerColumna">
-                                    <input type="text" name="id_modificar" value="{{producto[0]}}" readonly required>
+                            <form action="{{ url_for('Modificar_Producto') }}" method="post">
+                                <th class="id">
+                                    <input type="text" name="id" value="{{ id }}">
+                                </th>
+                                <td>
+                                    <input type="text" name="tipo" value="{{ producto['tipo'] }}">
                                 </td>
                                 <td>
-                                    <input type="text" name="tipo_modificar" value="{{producto[1]}}" required>
+                                    <input type="text" name="nombre" value="{{ producto['nombre'] }}">
                                 </td>
                                 <td>
-                                    <input type="text" name="nombre_modificar" value="{{producto[2]}}" required>
+                                    <input type="text" name="modelo" value="{{ producto['modelo'] }}">
                                 </td>
                                 <td>
-                                    <input type="text" name="modelo_modificar" value="{{producto[3]}}" required>
+                                    <input type="text" name="estilo" value="{{ producto['estilo'] }}">
                                 </td>
                                 <td>
-                                    <input type="text" name="medidas_modificar" value="{{producto[4]}}" required>
+                                    <input type="text" name="medidas" value="{{ producto['medidas'] }}">
                                 </td>
-                                <td class="ultimaColumna">
-                                    <div>
-                                        <input type="submit" value="Guardar">
-
-                                        <form method="post">
-                                            <input type="hidden" name="id_eliminar" value="{{producto[0]}}">
-                                            <input type="submit" formaction="/productos/eliminar" value="Eliminar">
-                                        </form>
-                                    </div>
+                                <td>
+                                    <input type="number" name="precio_venta" value="{{ producto['precio_venta'] }}">
                                 </td>
+                                <th class="columnaAcciones">
+                                    <span>
+                                        <input type="submit" value="Modificar">
+                                        <input type="submit" value="Eliminar" formaction="{{ url_for('Eliminar_Producto') }}">
+                                    </span>
+                                </th>
                             </form>
                         </tr>
-                        {% endfor %}
-                        {% endif %}
-                        <tr>
-                            <form action="/productos/agregar" method="post">
-                                <td class="primerColumna">
-                                    <input type="text" name="id_agregar" value="{{productoSiguiente}}" readonly required>
-                                </td>
-                                <td>
-                                    <select name="tipo_agregar" id="tipo_agregar">
-                                        {% for tipo in productosTipos %}
-                                        <option value="{{tipo}}">{{tipo}}</option>
-                                        {% endfor %}
-                                        <option value="Otro">Otro</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="text" name="nombre_agregar" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="modelo_agregar" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="medidas_agregar" required>
-                                </td>
-                                <td>
-                                    <input type="submit" value="Agregar">
-                                </td>
-                            </form>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                    {% endfor %}
+                {% endif %}
+                <tr>
+                    <form action="{{ url_for('Agregar_Producto') }}" method="post">
+                        <th>
+                            {{ producto_siguiente }}
+                        </th>
+                        <td>
+                            <input type="text" name="tipo">
+                        </td>
+                        <td>
+                            <input type="text" name="nombre">
+                        </td>
+                        <td>
+                            <input type="text" name="modelo">
+                        </td>
+                        <td>
+                            <input type="text" name="estilo">
+                        </td>
+                        <td>
+                            <input type="text" name="medidas">
+                        </td>
+                        <td>
+                            <input type="number" name="precio_venta">
+                        </td>
+                        <th class="columnaAcciones">
+                            <span>
+                                <input type="submit" value="Agregar">
+                            </span>
+                        </th>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+    </main>
 </body>
-
 </html>

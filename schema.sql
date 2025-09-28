@@ -93,7 +93,33 @@ CREATE TABLE facturas_detalle (
 
 -- Insertar datos de ejemplo en USUARIOS
 INSERT INTO usuarios (username, password, nombres, rol) VALUES
-('admin', 'admin', 'Juan Pérez', 'Administrador'),
-('operario', 'op', 'María Gómez', 'Operario'),
-('gerente', 'gerente', 'Carlos Ruiz', 'Gerente'),
-('encargado', 'enc', 'Lucía Fernández', 'Encargado');
+('admin', 'admin', 'Administrador Admin', 'Administrador'),
+('agerente', 'passA', 'Ana Alvarez', 'Gerente'),
+('bgerente', 'passB', 'Bruno Benitez', 'Gerente'),
+('cencargado', 'passC', 'Carla Cortez', 'Encargado'),
+('dencargado', 'passD', 'Diego Diaz', 'Encargado'),
+('eoperario', 'passE', 'Elena Escobar', 'Operario'),
+('foperario', 'passF', 'Fernando Fernandez', 'Operario'),
+('goperario', 'passG', 'Gabriela Gomez', 'Operario'),
+('hoperario', 'passH', 'Hugo Herrera', 'Operario'),
+('ioperario', 'passI', 'Isabel Iglesias', 'Operario'),
+('joperario', 'passJ', 'Javier Juarez', 'Operario'),
+('koperario', 'passK', 'Karina Kruger', 'Operario'),
+('loperario', 'passL', 'Luis Lopez', 'Operario'),
+('moperario', 'passM', 'Maria Martinez', 'Operario'),
+('noperario', 'passN', 'Nicolas Navarro', 'Operario'),
+('ooperario', 'passO', 'Olga Ortega', 'Operario');
+
+-- Insertar datos de ejemplos en PRODUCTOS
+INSERT INTO productos (tipo, nombre, modelo, estilo, medidas, precio_venta) VALUES
+('Maceta','Cubo'           ,'Base'    ,'Plano'   ,'20x20x20',1500.50),
+('Maceta','Cubo'           ,'Alta'    ,'Plano'   ,'20x20x30',1800.75),
+('Maceta','Cubo'           ,'Baja'    ,'Plano'   ,'20x20x10',1300.50),
+('Maceta','Cubo'           ,'Colgante','Colgante','20x20x20',2100.00),
+('Maceta','Prisma'         ,'Base'    ,'Plano'   ,'20x40x20',2000.00),
+('Maceta','Prisma'         ,'Alta'    ,'Plano'   ,'20x40x20',2200.00),
+('Maceta','Prisma'         ,'Colgante','Colgante','20x40x20',2850.05),
+('Plato' ,'Rectangulo 20x20','Base'    ,'Plano'   ,'20x20x2' ,350.25),
+('Plato' ,'Rectangulo 20x40','Base'    ,'Plano'   ,'20x40x2' ,550.50),
+('Maceta','Cilindro'       ,'Base'    ,'Plano'   ,'20x20x20',1750.75),
+('Plato' ,'Circulo 20x20'   ,'Base'    ,'Plano'   ,'20x20x2' ,400.00);

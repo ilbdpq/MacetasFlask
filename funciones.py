@@ -56,7 +56,7 @@ UNIDADES = {
 }
 
 def Tiempo():
-    return datetime.datetime.now().strftime("%H:%M:%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def Validar_Medidas(medidas):
     # 1 a 4 dígitos x 1 a 4 dígitos x 1 a 4 dígitos (10x20x30)
@@ -193,81 +193,99 @@ class Usuario:
 
     def delete(self, id):
         self.CUR.execute('''DELETE FROM usuarios WHERE id = ?''',
-                         (id))
+                         (id,))
         self.DB.commit()
 
         return Mensajes['USUARIO_EXITO_ELIMINAR']
 
-class Productos:
+class Producto:
     def __init__(self, DB):
         self.DB = DB
+        self.CUR = self.DB.cursor()
         
-    def Consultar(self):
-        return self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
-    
-    def Consultar_Tipos(self):
-        cursor = self.DB.cursor()
-        cursor.row_factory = lambda cursor, row: row[0]
-        return cursor.execute('SELECT DISTINCT tipo FROM productos WHERE habilitado != 0 ORDER BY tipo ASC').fetchall()
-    
-    def Consultar_Siguiente_ID(self):
-        resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
-        
-        if resultado is None:
+    def getAll(self):
+        self.CUR.execute('SELECT id, tipo, nombre, modelo, estilo, medidas, printf("%.2f", precio_venta), habilitado FROM productos')
+        query = self.CUR.fetchall()
+        productos = {}
+
+        for id, tipo, nombre, modelo, estilo, medidas, precio_venta, habilitado in query:
+            producto = {
+                'tipo' : tipo,
+                'nombre' : nombre,
+                'modelo' : modelo,
+                'estilo' : estilo,
+                'medidas' : medidas,
+                'precio_venta' : float(precio_venta),
+                'habilitado' : habilitado
+            }
+            productos[id] = producto
+
+        return productos
+
+    def getEnabled(self):
+        self.CUR.execute('SELECT id, tipo, nombre, modelo, estilo, medidas, printf("%.2f", precio_venta) FROM productos WHERE habilitado == 1')
+        query = self.CUR.fetchall()
+        productos = {}
+
+        for id, tipo, nombre, modelo, estilo, medidas, precio_venta in query:
+            producto = {
+                'tipo' : tipo,
+                'nombre' : nombre,
+                'modelo' : modelo,
+                'estilo' : estilo,
+                'medidas' : medidas,
+                'precio_venta' : float(precio_venta)
+            }
+            productos[id] = producto
+
+        return productos
+
+    def getDisabled(self):
+        self.CUR.execute('SELECT id, tipo, nombre, modelo, estilo, medidas, printf("%.2f", precio_venta) FROM productos WHERE habilitado == 0')
+        query = self.CUR.fetchall()
+        productos = {}
+
+        for id, tipo, nombre, modelo, estilo, medidas, precio_venta in query:
+            producto = {
+                'tipo' : tipo,
+                'nombre' : nombre,
+                'modelo' : modelo,
+                'estilo' : estilo,
+                'medidas' : medidas,
+                'precio_venta' : float(precio_venta)
+            }
+            productos[id] = producto
+
+        return productos
+
+    def getNext(self):
+        try:
+            query = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
+
+        except TypeError:
             return 1
         
-        return resultado
+        return query
 
-    def Consultar_Formateado(self):
-        resultado = self.DB.execute('SELECT * FROM productos WHERE habilitado != 0').fetchall()
-        return {fila[0] : f'{fila[1]} {fila[2]} ({fila[3]})' for fila in resultado}
-    
-    def Seleccionar(self, id):
-        return self.DB.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()
-    
-    def Agregar(self, tipo, nombre, modelo, medidas):
-        if not Validar_Texto(tipo):
-            return Mensajes['PRODUCTO_ERROR_TIPO']
-        
-        if not Validar_Texto(nombre):
-            return Mensajes['PRODUCTO_ERROR_NOMBRE']
-        
-        if not Validar_Texto(modelo):
-            return Mensajes['PRODUCTO_ERROR_MODELO']
-        
-        if not Validar_Medidas(medidas):
-            return Mensajes['PRODUCTO_ERROR_MEDIDAS']
+    def set(self, id, tipo, nombre, modelo, estilo, medidas, precio_venta):
+        self.CUR.execute('UPDATE productos SET tipo = ?, nombre = ?, modelo = ?, estilo = ?, medidas = ?, precio_venta = ? WHERE id = ?',
+                             (tipo, nombre, modelo, estilo, medidas, precio_venta, id))
+        self.DB.commit()
 
-        if not (Validar_Duplicado(self.DB, 'productos', 'nombre', nombre) or Validar_Duplicado(self.DB, 'productos', 'modelo', modelo)):
-            return Mensajes['PRODUCTO_ERROR_DUPLICADO']
-        
-        self.DB.execute('INSERT INTO productos (tipo, nombre, modelo, medidas) VALUES (?, ?, ?, ?)', (tipo, nombre, modelo, medidas))
-        self.DB.commit()
-        
-        return Mensajes['PRODUCTO_EXITO_AGREGAR']
-    
-    def Modificar(self, id, tipo, nombre, modelo, medidas):
-        if not Validar_Texto(tipo):
-            return Mensajes['PRODUCTO_ERROR_TIPO']
-        
-        if not Validar_Texto(nombre):
-            return Mensajes['PRODUCTO_ERROR_NOMBRE']
-        
-        if not Validar_Texto(modelo):
-            return Mensajes['PRODUCTO_ERROR_MODELO']
-        
-        if not Validar_Medidas(medidas):
-            return Mensajes['PRODUCTO_ERROR_MEDIDAS']
-        
-        self.DB.execute('UPDATE productos SET tipo = ?, nombre = ?, modelo = ?, medidas = ? WHERE id = ?', (tipo, nombre, modelo, medidas, id))
-        self.DB.commit()
-        
         return Mensajes['PRODUCTO_EXITO_MODIFICAR']
-    
-    def Eliminar(self, id):
-        self.DB.execute('UPDATE productos SET habilitado = 0 WHERE id = ?', (id,))
+
+    def add(self, tipo, nombre, modelo, estilo, medidas, precio_venta):
+        self.CUR.execute('INSERT INTO productos (tipo, nombre, modelo, estilo, medidas, precio_venta) VALUES (?,?,?,?,?,?)',
+                         (tipo, nombre, modelo, estilo, medidas, precio_venta))
         self.DB.commit()
-        
+
+        return Mensajes['PRODUCTO_EXITO_MODIFICAR']
+
+    def delete(self, id):
+        self.CUR.execute('UPDATE productos SET habilitado = 0 WHERE id = ?',
+                         (id,))
+        self.DB.commit()
+
         return Mensajes['PRODUCTO_EXITO_ELIMINAR']
 
 

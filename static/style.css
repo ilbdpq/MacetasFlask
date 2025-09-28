@@ -10,6 +10,7 @@ html {
     --color-negro: #111;
     --color-grisoscuro: #808080;
     --color-gris: #BBB;
+    --color-grisclaro: #DDD;
     --color-blanco: #EEE;
     --borde-raised: 2px outset var(--color-blanco);
     --borde-sunken: 2px inset var(--color-blanco);
@@ -43,7 +44,7 @@ body {
     'header header'
     'aside main';
     grid-template-columns: 12rem 1fr;
-    grid-template-rows: max-content auto;
+    grid-template-rows: 3rem auto;
     row-gap: 0.5rem;
     column-gap: 0.5rem;
 }
@@ -55,12 +56,24 @@ header {
     color: var(--color-blanco);
     font-size: var(--fuente-grande);
     padding: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
     header a {
         background-image: linear-gradient(to right, var(--color-azul), var(--color-celeste));
         filter: invert(100%);
         color: transparent;
         background-clip: text;
+    }
+    header input {
+        height: 2rem;
+        background-color: var(--color-gris);
+        border: var(--borde-raised);
+    }
+    header input:active {
+        border: var(--borde-sunken);
     }
 
 aside {
@@ -111,19 +124,10 @@ nav {
 #mensajes legend {
     margin-bottom: 0.25rem;
 }
-@keyframes mensaje-flash {
-    0% {
-        background: var(--color-blanco);
-    }
-    80% {
-        background: inherit;
-    }
-}
 .mensaje {
     border: var(--borde-sunken);
-    background-color: var(--color-gris);
+    background-color: var(--color-blanco);
     padding: 0.25rem;
-    animation: mensaje-flash 10s;
 }
 
 main {
@@ -187,7 +191,7 @@ table {
     table td:focus-within input {
         color: var(--color-blanco);
     }
-    table input[type=text] {
+    table input[type=text], table input[type=password] {
         background: none;
         border: none;
     }
@@ -207,6 +211,9 @@ table {
     table td:focus-within select {
         background-color: var(--color-azul);
         color: var(--color-blanco);
+    }
+    table tbody tr:nth-child(even) td {
+        background-color: var(--color-grisclaro);
     }
 
 #login {

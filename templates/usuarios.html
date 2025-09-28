@@ -28,8 +28,8 @@
             <tbody>
                 {% if usuarios %}
                     {% for id, usuario in usuarios.items() %}
-                        <form action="{{ url_for('Modificar_Usuario') }}" method="post">
-                            <tr>
+                        <tr>
+                            <form action="{{ url_for('Modificar_Usuario') }}" method="post">
                                 <th class="id">
                                     <input type="text" name="id" value="{{ id }}">
                                 </th>
@@ -37,7 +37,7 @@
                                     <input type="text" name="username" value="{{ usuario['username'] }}">
                                 </td>
                                 <td>
-                                    <input type="text" name="password" value="{{ usuario['password'] }}">
+                                    <input type="password" name="password" value="{{ usuario['password'] }}">
                                 </td>
                                 <td>
                                     <input type="text" name="nombres" value="{{ usuario['nombres'] }}">
@@ -59,31 +59,37 @@
                                         <input type="submit" value="Eliminar" formaction="{{ url_for('Eliminar_Usuario') }}">
                                     </span>
                                 </th>
-                            </tr>
-                        </form>
+                            </form>
+                        </tr>
                     {% endfor %}
                 {% endif %}
                 <tr>
-                    <th>
-                        {{ usuario_siguiente }}
-                    </th>
-                    <td>
-                        <input type="text" name="">
-                    </td>
-                    <td>
-                        <input type="text" name="">
-                    </td>
-                    <td>
-                        <input type="text" name="">
-                    </td>
-                    <td>
-                        <input type="text" name="">
-                    </td>
-                    <th class="columnaAcciones">
-                        <span>
-                            <input type="button" value="Agregar">
-                        </span>
-                    </th>
+                    <form action="{{ url_for('Agregar_Usuario') }}" method="post">
+                        <th>
+                            {{ usuario_siguiente }}
+                        </th>
+                        <td>
+                            <input type="text" name="username">
+                        </td>
+                        <td>
+                            <input type="password" name="password">
+                        </td>
+                        <td>
+                            <input type="text" name="nombres">
+                        </td>
+                        <td>
+                            <select name="rol">
+                                {% for rol in roles %}
+                                    <option value="{{ rol }}">{{ rol }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <th class="columnaAcciones">
+                            <span>
+                                <input type="submit" value="Agregar">
+                            </span>
+                        </th>
+                    </form>
                 </tr>
             </tbody>
         </table>

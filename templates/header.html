@@ -1,3 +1,9 @@
 <header>
     <legend><a href="{{ url_for('Index') }}">Macetas S.A.</a></legend>
+
+    {% if 'sesion' in session %}
+        <form action="{{ url_for('Logout') }}" method="post">
+            <input type="submit" value="Cerrar sesión">
+        </form>
+    {% endif %}       
 </header>
