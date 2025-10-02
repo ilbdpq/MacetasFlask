@@ -15,13 +15,16 @@ function agregarFila() {
     tabla.insertBefore(nuevaFila, submitRow);
 }
 
-function controlRuedita(e, input, step) {
+function controlRueda(e, input, step) {
     e.preventDefault();
+
     let value = parseFloat(input.value) || 0;
-    let multiplier = e.shiftKey ? 10 : 1;
+    let multiplier = e.shiftKey && e.ctrlKey ? 100 : e.shiftKey ? 10 : 1;
     let delta = (e.deltaY < 0 ? 1 : -1) * step * multiplier;
     let newValue = value + delta;
+
     if (input.min !== undefined && newValue < parseFloat(input.min)) newValue = parseFloat(input.min);
+    
     input.value = Math.round(newValue * 100000) / 100000;
     input.dispatchEvent(new Event('input'));
 }

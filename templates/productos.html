@@ -6,6 +6,7 @@
     <title>Document</title>
 
     <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 
 <body>
@@ -33,25 +34,25 @@
                         <tr>
                             <form action="{{ url_for('Modificar_Producto') }}" method="post">
                                 <th class="id">
-                                    <input type="text" name="id" value="{{ id }}">
+                                    <input type="text" name="id" value="{{ id }}" readonly>
                                 </th>
                                 <td>
-                                    <input type="text" name="tipo" value="{{ producto['tipo'] }}">
+                                    <input type="text" name="tipo" value="{{ producto['tipo'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="nombre" value="{{ producto['nombre'] }}">
+                                    <input type="text" name="nombre" value="{{ producto['nombre'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="modelo" value="{{ producto['modelo'] }}">
+                                    <input type="text" name="modelo" value="{{ producto['modelo'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="estilo" value="{{ producto['estilo'] }}">
+                                    <input type="text" name="estilo" value="{{ producto['estilo'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="medidas" value="{{ producto['medidas'] }}">
+                                    <input type="text" name="medidas" value="{{ producto['medidas'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="number" name="precio_venta" value="{{ producto['precio_venta'] }}">
+                                    <input type="number" name="precio_venta" value="{{ producto['precio_venta'] }}" required min="0" step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
                                 </td>
                                 <th class="columnaAcciones">
                                     <span>
@@ -69,22 +70,22 @@
                             {{ producto_siguiente }}
                         </th>
                         <td>
-                            <input type="text" name="tipo">
+                            <input type="text" name="tipo" required>
                         </td>
                         <td>
-                            <input type="text" name="nombre">
+                            <input type="text" name="nombre" required>
                         </td>
                         <td>
-                            <input type="text" name="modelo">
+                            <input type="text" name="modelo" required>
                         </td>
                         <td>
-                            <input type="text" name="estilo">
+                            <input type="text" name="estilo" required>
                         </td>
                         <td>
-                            <input type="text" name="medidas">
+                            <input type="text" name="medidas" required>
                         </td>
                         <td>
-                            <input type="number" name="precio_venta">
+                            <input type="number" name="precio_venta" required min="0" step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
                         </td>
                         <th class="columnaAcciones">
                             <span>

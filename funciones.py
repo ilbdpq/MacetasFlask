@@ -156,12 +156,12 @@ class Usuario:
 
     def getNext(self):
         try:
-            query = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "usuarios"').fetchone()[0]
+            id = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "usuarios"').fetchone()[0]
 
         except TypeError:
             return 1
         
-        return query
+        return id
 
     def get(self, username):
         self.CUR.execute('SELECT FROM usuarios WHERE username = ?',
@@ -260,12 +260,23 @@ class Producto:
 
     def getNext(self):
         try:
-            query = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
+            id = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "productos"').fetchone()[0]
 
         except TypeError:
             return 1
         
-        return query
+        return id
+
+
+    def getList(self):
+        self.CUR.execute("SELECT id, tipo || ' ' || nombre || ' ' || modelo FROM productos WHERE habilitado = 1")
+        query = self.CUR.fetchall()
+        productos = {}
+
+        for id, texto in query:
+            productos[id] = texto
+
+        return productos
 
     def set(self, id, tipo, nombre, modelo, estilo, medidas, precio_venta):
         self.CUR.execute('UPDATE productos SET tipo = ?, nombre = ?, modelo = ?, estilo = ?, medidas = ?, precio_venta = ? WHERE id = ?',
@@ -289,172 +300,192 @@ class Producto:
         return Mensajes['PRODUCTO_EXITO_ELIMINAR']
 
 
-class Componentes:
+class Componente:
     def __init__(self, DB):
         self.DB = DB
+        self.CUR = self.DB.cursor()
+
+    def getUnidades(self):
+        unidades = {
+            'kg' : 'Kilogramo(s)',
+            'l' : 'Litro(s)',
+            'cm' : 'Centímetro(s)',
+            'u' : 'Unidad(es)'
+        }
+
+        return unidades
     
-    def Consultar(self):
-        return self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
-    
-    def Consultar_Siguiente_ID(self):
+    def getAll(self):
+        self.CUR.execute('SELECT id, nombre, unidad, printf("%.2f", precio_costo), habilitado FROM componentes')
+        query = self.CUR.fetchall()
+        componentes = {}
+
+        for id, nombre, unidad, precio_costo, habilitado in query:
+            componente = {
+                'nombre' : nombre,
+                'unidad' : unidad,
+                'precio_costo' : float(precio_costo),
+                'habilitado' : habilitado
+            }
+            componentes[id] = componente
+
+        return componentes
+
+    def getEnabled(self):
+        self.CUR.execute('SELECT id, nombre, unidad, printf("%.2f", precio_costo) FROM componentes WHERE habilitado == 1')
+        query = self.CUR.fetchall()
+        componentes = {}
+
+        for id, nombre, unidad, precio_costo in query:
+            componente = {
+                'nombre' : nombre,
+                'unidad' : unidad,
+                'precio_costo' : float(precio_costo)
+            }
+            componentes[id] = componente
+
+        return componentes
+
+    def getDisabled(self):
+        self.CUR.execute('SELECT id, nombre, unidad, printf("%.2f", precio_costo) FROM componentes WHERE habilitado == 0')
+        query = self.CUR.fetchall()
+        componentes = {}
+
+        for id, nombre, unidad, precio_costo in query:
+            componente = {
+                'nombre' : nombre,
+                'unidad' : unidad,
+                'precio_costo' : float(precio_costo)
+            }
+            componentes[id] = componente
+
+        return componentes
+
+    def getNext(self):
         try:
-            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes"').fetchone()[0]
+            id = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes"').fetchone()[0]
 
         except TypeError:
             return 1
         
-        return resultado
-    
-    def Consultar_Formateado(self):
-        resultado = self.DB.execute('SELECT * FROM componentes WHERE habilitado != 0').fetchall()
-        return {fila[0] : f'{fila[1]} ({fila[2]})' for fila in resultado}
-    
-    def Seleccionar(self, id):
-        return self.DB.execute('SELECT * FROM componentes WHERE id = ?', (id,)).fetchone()[0]
-    
-    def Agregar(self, nombre, unidad):
-        if not Validar_Texto(nombre):
-            return Mensajes['COMPONENTE_ERROR_NOMBRE']
-        
-        if not Validar_Unidad(unidad):
-            return Mensajes['COMPONENTE_ERROR_UNIDAD']
+        return id
 
-        if not Validar_Duplicado(self.DB, 'componentes', 'nombre', nombre):
-            return Mensajes['COMPONENTE_ERROR_DUPLICADO']
-        
-        self.DB.execute('INSERT INTO componentes (nombre, unidad) VALUES (?, ?)', (nombre, unidad))
+    def getList(self):
+        self.CUR.execute("SELECT id, nombre || ' (' || unidad || ')' FROM componentes WHERE habilitado = 1")
+        query = self.CUR.fetchall()
+        componentes = {}
+
+        for id, texto in query:
+            componentes[id] = texto
+
+        return componentes
+
+    def set(self, id, nombre, unidad, precio_costo):
+        self.CUR.execute('UPDATE componentes SET nombre = ?, unidad = ?, precio_costo = ? WHERE id = ?',
+                             (nombre, unidad, precio_costo, id))
         self.DB.commit()
+
+        return Mensajes['COMPONENTE_EXITO_MODIFICAR']
         
+    def add(self, nombre, unidad, precio_costo):
+        self.CUR.execute('INSERT INTO componentes (nombre, unidad, precio_costo) VALUES (?,?,?)',
+                         (nombre, unidad, precio_costo))
+        self.DB.commit()
+
         return Mensajes['COMPONENTE_EXITO_AGREGAR']
-    
-    def Modificar(self, id, nombre, unidad):
-        if not Validar_Texto(nombre):
-            return Mensajes['COMPONENTE_ERROR_NOMBRE']
-        
-        if not Validar_Unidad(unidad):
-            return Mensajes['COMPONENTE_ERROR_UNIDAD']
-        
-        self.DB.execute('UPDATE componentes SET nombre = ?, unidad = ? WHERE id = ?', (nombre, unidad, id))
+
+    def delete(self, id):
+        self.CUR.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?',
+                         (id,))
         self.DB.commit()
-        
-        return Mensajes['COMPONENTE_EXITO_MODIFICAR']
-    
-    def Eliminar(self, id):
-        self.DB.execute('UPDATE componentes SET habilitado = 0 WHERE id = ?', (id,))
-        self.DB.commit()
-        
+
         return Mensajes['COMPONENTE_EXITO_ELIMINAR']
     
-    
-class Componentes_Por_Producto:
+class Componente_Por_Producto:
     def __init__(self, DB):
         self.DB = DB
+        self.CUR = self.DB.cursor()
 
-    def Consultar(self):
-        return self.DB.execute('SELECT * FROM componentes_por_producto').fetchall()
+    def getEnabled(self):
+        self.CUR.execute('SELECT id, id_producto, id_componente, cantidad FROM componentes_por_producto WHERE habilitado = 1')
+        query = self.CUR.fetchall()
+        componentes_por_producto = {}
 
-    def Consultar_Siguiente_ID(self):
+        for id, id_producto, id_componente, cantidad in query:
+            componente = {
+                'id_producto' : id_producto,
+                'id_componente' : id_componente,
+                'cantidad' : cantidad
+            }
+            componentes_por_producto[id] = componente
+
+        return componentes_por_producto
+
+    def getDisabled(self):
+        self.CUR.execute('SELECT id, id_producto, id_componente, cantidad FROM componentes_por_producto WHERE habilitado = 0')
+        query = self.CUR.fetchall()
+        componentes_por_producto = {}
+
+        for id, id_producto, id_componente, cantidad in query:
+            componente = {
+                'id_producto' : id_producto,
+                'id_componente' : id_componente,
+                'cantidad' : cantidad
+            }
+            componentes_por_producto[id] = componente
+
+        return componentes_por_producto
+
+    def getNext(self):
         try:
-            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes_por_producto"').fetchone()[0]
+            id = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "componentes_por_producto"').fetchone()[0]
 
         except TypeError:
             return 1
         
-        return resultado
+        return id
 
-    def Seleccionar(self, id):
-        return self.DB.execute('SELECT * FROM componentes_por_producto WHERE id = ?', (id,)).fetchone()
-
-    def Agregar(self, id_producto, id_componente, cantidad):
-        if not Validar_Cantidad(cantidad):
-            return Mensajes['COMPONENTE-POR-PRODUCTO_ERROR_CANTIDAD']
-        
-        self.DB.execute(f'INSERT INTO componentes_por_producto (id_producto, id_componente, cantidad) VALUES (?, ?, ?)', (id_producto, id_componente, cantidad))
+    def set(self, id, id_producto, id_componente, cantidad):
+        self.CUR.execute('UPDATE componentes_por_producto SET id_producto = ?, id_componente = ?, cantidad = ? WHERE id = ?',
+                        (id_producto, id_componente, cantidad, id))
         self.DB.commit()
-        
+
+        return Mensajes['COMPONENTE-POR-PRODUCTO_EXITO_MODIFICAR']
+
+    def delete(self, id):
+        self.CUR.execute('UPDATE componentes_por_producto SET habilitado = 0 WHERE id = ?',
+                        (id,))
+        self.DB.commit()
+
+        return Mensajes['COMPONENTE-POR-PRODUCTO_EXITO_ELIMINAR']
+
+    def add(self, id_producto, id_componente, cantidad):
+        self.CUR.execute('INSERT INTO componentes_por_producto (id_producto, id_componente, cantidad) VALUES (?,?,?)',
+                        (id_producto, id_componente, cantidad))
+        self.DB.commit()
+
         return Mensajes['COMPONENTE-POR-PRODUCTO_EXITO_AGREGAR']
-
-    def Modificar(self, id, id_producto, nombre, medidas, cantidad):
-        if not Validar_Texto(nombre):
-            return 'Error: El nombre solo puede contener letras, números, espacios y guiones.'
-        
-        self.DB.execute('UPDATE componentes_por_producto SET id_producto = ?, nombre = ?, medidas = ?, cantidad = ? WHERE id = ?', (id_producto, nombre, medidas, cantidad, id))
-        self.DB.commit()
-        
-        return Mensajes['COMPONENTE_EXITO_MODIFICAR']
-
-    def Eliminar(self, id):
-        self.DB.execute('DELETE FROM componentes_por_producto WHERE id = ?', (id,))
-        self.DB.commit()
-        return Mensajes['COMPONENTE_EXITO_ELIMINAR']
 
 class Stock:
     def __init__(self, DB):
         self.DB = DB
+        self.CUR = self.DB.cursor()
 
-    def Consultar(self):
-        return self.DB.execute('SELECT id, tipo_item, id_item, cantidad FROM stock').fetchall()
+    def getAll(self, DB):
+        self.CUR.execute('SELECT id, tipo_item, id_item, cantidad, movimiento FROM stock')
+        query = self.CUR.fetchall()
+        stock = {}
+        
+        for id, tipo_item, id_item, cantidad, movimiento in query:
+            item = {
+                'tipo_item' : tipo_item,
+                'id_item' : id_item,
+                'cantidad' : cantidad,
+                'movimiento' : movimiento
+            }
+            stock[id] = item
 
-    def Consultar_Siguiente_ID(self):
-        try:
-            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "stock"').fetchone()[0]
-
-        except TypeError:
-            return 1
-        
-        return resultado
-
-    def Agregar(self, id_item, tipo_item, cantidad):
-        if not Validar_Item(self.DB, tipo_item, id_item):
-            return Mensajes['STOCK_ERROR_ITEM']
-
-        if not Validar_Stock(self.DB, tipo_item, id_item):
-            return Mensajes['STOCK_ERROR_ITEM']
-
-        if not Validar_Cantidad(cantidad, minimo=0):
-            return Mensajes['STOCK_ERROR_CANTIDAD']
-        
-        self.DB.execute(f'INSERT INTO stock (id_item, tipo_item, cantidad) VALUES (?, ?, ?)', (id_item, tipo_item, cantidad))
-        self.DB.commit()
-        
-        return 'Stock agregado exitosamente.'
-
-    def Agregar_Fabricacion(self, id_items, cantidades):
-        for i in range(len(id_items)):
-            if not Validar_Item(self.DB, 'Producto', id_items[i]):
-                return Mensajes['STOCK_ERROR_ITEM']
-
-            if not Validar_Cantidad(cantidades[i], minimo=0):
-                return Mensajes['STOCK_ERROR_CANTIDAD']
-        
-            self.DB.execute(f'UPDATE stock SET cantidad = cantidad + ? WHERE id_item = ? AND tipo_item = "Producto"', (cantidades[i], id_items[i]))
-        
-        self.DB.commit()
-        
-        return 'Stock actualizado exitosamente.'
-
-    def Modificar(self, id, cantidad):
-        if not Validar_Cantidad(cantidad):
-            return Mensajes['STOCK_ERROR_CANTIDAD']
-        
-        self.DB.execute('UPDATE stock SET cantidad = ? WHERE id = ?', (cantidad, id))
-        self.DB.commit()
-        
-        return Mensajes['STOCK_EXITO_MODIFICAR']
-
-    def Facturar(self, id_items, cantidades):
-        for i in range(len(id_items)):
-            if not Validar_Item(self.DB, 'Producto', id_items[i]):
-                return Mensajes['STOCK_ERROR_ITEM']
-
-            if not Validar_Cantidad(cantidades[i], minimo=0):
-                return Mensajes['STOCK_ERROR_CANTIDAD']
-        
-            self.DB.execute(f'UPDATE stock SET cantidad = cantidad - ? WHERE id_item = ? AND tipo_item = "Producto"', (cantidades[i], id_items[i]))
-        
-        self.DB.commit()
-        
-        return 'Stock actualizado exitosamente.'
+        return stock
 
 class Fabricaciones:
     def __init__(self, DB):

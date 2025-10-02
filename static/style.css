@@ -172,7 +172,10 @@ table {
         height: 1.5rem;
         padding: 0 0.25rem;
     }
-    table td:focus-within {
+    table tr:nth-child(even) td {
+        background-color: var(--color-grisclaro);
+    }
+    table tr td:focus-within {
         background-color: var(--color-azul);
     }
     table .columnaAcciones {
@@ -191,7 +194,7 @@ table {
     table td:focus-within input {
         color: var(--color-blanco);
     }
-    table input[type=text], table input[type=password] {
+    table input[type=text], table input[type=password], table input[type=number] {
         background: none;
         border: none;
     }
@@ -211,9 +214,6 @@ table {
     table td:focus-within select {
         background-color: var(--color-azul);
         color: var(--color-blanco);
-    }
-    table tbody tr:nth-child(even) td {
-        background-color: var(--color-grisclaro);
     }
 
 #login {

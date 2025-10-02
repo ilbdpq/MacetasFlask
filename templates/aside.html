@@ -5,7 +5,7 @@
             <summary>Manejo de datos</summary>
             <a href="{{ url_for('Template_Usuarios') }}">Usuarios</a>
             <a href="{{ url_for('Template_Productos') }}">Productos</a>
-            <a href="./componentes.html">Componentes</a>
+            <a href="{{ url_for('Template_Componentes') }}">Componentes</a>
             <a href="/stock">Stock</a>
             <a href="/fabricaciones">Fabricaciones</a>
             <a href="/facturas">Facturas</a>
@@ -25,7 +25,7 @@
         <div id="mensajes">
         <legend>Mensajes</legend>
 
-        {% for mensaje in reversed(mensajes) %}                
+        {% for mensaje in mensajes %}                
             <span class="mensaje">
                 {{ mensaje }}
             </span>

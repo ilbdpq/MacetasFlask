@@ -38,6 +38,8 @@ def Inyectar_Datos():
     DB = Get_DB()
     Usuario = fun.Usuario(DB)
     Producto = fun.Producto(DB)
+    Componente = fun.Componente(DB)
+    Componente_Por_Producto = fun.Componente_Por_Producto(DB)
     
     return dict(
         roles = Usuario.getRoles(),
@@ -46,8 +48,16 @@ def Inyectar_Datos():
 
         productos_habilitados = Producto.getEnabled(),
         producto_siguiente = Producto.getNext(),
+        productos_lista = Producto.getList(),
+
+        unidades = Componente.getUnidades(),
+        componentes_habilitados = Componente.getEnabled(),
+        componente_siguiente = Componente.getNext(),
+        componentes_lista = Componente.getList(),
+        componentes_por_producto_habilitados = Componente_Por_Producto.getEnabled(),
+        componentes_por_producto_siguiente = Componente_Por_Producto.getNext(),
     )
-    
+
 '''
 Página principal
 '''
@@ -115,7 +125,7 @@ def Modificar_Usuario():
     rol = request.form['rol']
 
     Usuario = fun.Usuario(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Usuario.set(id=id, username=username, password=password, nombres=nombres, rol=rol)]
+    session['mensajes'] = [fun.Tiempo(), Usuario.set(id=id, username=username, password=password, nombres=nombres, rol=rol)]
     return redirect(url_for('Template_Usuarios'))
         
 @APP.route('/usuarios/eliminar/', methods=['POST'])
@@ -123,7 +133,7 @@ def Eliminar_Usuario():
     id = request.form['id']
 
     Usuario = fun.Usuario(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Usuario.delete(id=id)]
+    session['mensajes'] = [fun.Tiempo(), Usuario.delete(id=id)]
 
     return redirect(url_for('Template_Usuarios'))
 
@@ -135,7 +145,7 @@ def Agregar_Usuario():
     rol = request.form['rol']
 
     Usuario = fun.Usuario(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Usuario.add(username=username, password=password, nombres=nombres, rol=rol)]
+    session['mensajes'] = [fun.Tiempo(), Usuario.add(username=username, password=password, nombres=nombres, rol=rol)]
 
     return redirect(url_for('Template_Usuarios'))
 
@@ -163,7 +173,7 @@ def Modificar_Producto():
     precio_venta = request.form['precio_venta']
 
     Producto = fun.Producto(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Producto.set(id, tipo, nombre, modelo, estilo, medidas, precio_venta)]
+    session['mensajes'] = [fun.Tiempo(), Producto.set(id, tipo, nombre, modelo, estilo, medidas, precio_venta)]
 
     return redirect(url_for('Template_Productos'))
 
@@ -172,7 +182,7 @@ def Eliminar_Producto():
     id = request.form['id']
 
     Producto = fun.Producto(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Producto.delete(id=id)]
+    session['mensajes'] = [fun.Tiempo(), Producto.delete(id=id)]
     
     return redirect(url_for('Template_Productos'))
 
@@ -186,72 +196,86 @@ def Agregar_Producto():
     precio_venta = request.form['precio_venta']
 
     Producto = fun.Producto(Get_DB())
-    session['mensajes'] += [fun.Tiempo(), Producto.add(tipo, nombre, modelo, estilo, medidas, precio_venta)]
+    session['mensajes'] = [fun.Tiempo(), Producto.add(tipo, nombre, modelo, estilo, medidas, precio_venta)]
+
+    return redirect(url_for('Template_Productos'))
 
 '''
 Componentes
 '''
 @APP.route('/componentes/', methods=['GET'])
-def Componentes_Consultar():
-    return render_template('/componentes.html')
+def Template_Componentes():    
+    try:
+        session['mensajes']
 
-@APP.route('/componentes/agregar', methods=['POST'])
-def Componentes_Agregar():
-    if request.method == 'POST':
-        id = request.form['id_agregar']
-        nombre = request.form['nombre_agregar']
-        unidad = request.form['unidad_agregar']
+    except KeyError:
+        session['mensajes'] = []
+        
+    return render_template('/componentes.html', mensajes=session['mensajes'])
 
-        Componentes = fun.Componentes(Get_DB())
-        Stock = fun.Stock(Get_DB())
+@APP.route('/componentes/modificar/', methods=['POST'])
+def Modificar_Componente():
+    id = request.form['id']
+    nombre = request.form['nombre']
+    unidad = request.form['unidad']
+    precio_costo = request.form['precio_costo']
 
-        return render_template('/componentes.html', mensajes=[Componentes.Agregar(nombre, unidad), Stock.Agregar(id, 'Componente', 0)])
+    Componente = fun.Componente(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente.set(id, nombre, unidad, precio_costo)]
 
-    return render_template('/componentes.html')
+    return redirect(url_for('Template_Componentes'))
 
-@APP.route('/componentes/modificar', methods=['POST'])
-def Componentes_Modificar():
-    id = request.form['id_modificar']
-    nombre = request.form['nombre_modificar']
-    unidad = request.form['unidad_modificar']
+@APP.route('/componentes/eliminar/', methods=['POST'])
+def Eliminar_Componente():
+    id = request.form['id']
 
-    Componentes = fun.Componentes(Get_DB())
+    Componente = fun.Componente(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente.delete(id)]
 
-    return render_template('/componentes.html', mensajes=[Componentes.Modificar(id, nombre, unidad)])
+    return redirect(url_for('Template_Componentes'))
 
-@APP.route('/componentes/eliminar', methods=['POST'])
-def Componentes_Eliminar():
-    id = request.form['id_eliminar']
-    
-    Componentes = fun.Componentes(Get_DB())
+@APP.route('/componentes/agregar/', methods=['POST'])
+def Agregar_Componente():
+    nombre = request.form['nombre']
+    unidad = request.form['unidad']
+    precio_costo = request.form['precio_costo']
 
-    return render_template('/componentes.html', mensajes=[Componentes.Eliminar(id)])
+    Componente = fun.Componente(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente.add(nombre, unidad, precio_costo)]
 
-@APP.route('/componentes/por-producto/agregar', methods=['POST'])
-def Componentes_Por_Producto_Agregar():
+    return redirect(url_for('Template_Componentes'))
+
+@APP.route('/componentes/por-producto/modificar/', methods=['POST'])
+def Modificar_Componente_Por_Producto():
+    id = request.form['id']
     id_producto = request.form['id_producto']
     id_componente = request.form['id_componente']
     cantidad = request.form['cantidad']
-    
-    Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Agregar(id_producto, id_componente, cantidad)])
 
-@APP.route('/componentes/por-producto/modificar', methods=['POST'])
-def Componentes_Por_Producto_Modificar():
-    id = request.form['id_modificar']
+    Componente_Por_Producto = fun.Componente_Por_Producto(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente_Por_Producto.set(id, id_producto, id_componente, cantidad)]
+
+    return redirect(url_for('Template_Componentes'))
+
+@APP.route('/componentes/por-producto/eliminar/', methods=['POST'])
+def Eliminar_Componente_Por_Producto():
+    id = request.form['id']
+
+    Componente_Por_Producto = fun.Componente_Por_Producto(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente_Por_Producto.delete(id)]
+
+    return redirect(url_for('Template_Componentes'))
+
+@APP.route('/componentes/por-producto/agregar/', methods=['POST'])
+def Agregar_Componente_Por_Producto():
     id_producto = request.form['id_producto']
     id_componente = request.form['id_componente']
     cantidad = request.form['cantidad']
-    
-    Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Modificar(id, id_producto, id_componente, cantidad)])
 
-@APP.route('/componentes/por-producto/eliminar', methods=['POST'])
-def Componentes_Por_Producto_Eliminar():
-    id = request.form['id_eliminar']
-    
-    Componentes_Por_Producto = fun.Componentes_Por_Producto(Get_DB())
-    return render_template('/componentes.html', mensajes=[Componentes_Por_Producto.Eliminar(id)])
+    Componente_Por_Producto = fun.Componente_Por_Producto(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Componente_Por_Producto.add(id_producto, id_componente, cantidad)]
+
+    return redirect(url_for('Template_Componentes'))
 
 '''
 Stock
