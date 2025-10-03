@@ -58,6 +58,9 @@ UNIDADES = {
 def Tiempo():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+def Fecha():
+    return datetime.datetime.now().strftime("%Y-%m-%d")
+
 def Validar_Medidas(medidas):
     # 1 a 4 dígitos x 1 a 4 dígitos x 1 a 4 dígitos (10x20x30)
     patron = r'^\d{1,4}x\d{1,4}x\d{1,4}$'
@@ -413,9 +416,9 @@ class Componente_Por_Producto:
 
         for id, id_producto, id_componente, cantidad in query:
             componente = {
-                'id_producto' : id_producto,
-                'id_componente' : id_componente,
-                'cantidad' : cantidad
+                'id_producto' : int(id_producto),
+                'id_componente' : int(id_componente),
+                'cantidad' : float(cantidad)
             }
             componentes_por_producto[id] = componente
 
@@ -428,9 +431,9 @@ class Componente_Por_Producto:
 
         for id, id_producto, id_componente, cantidad in query:
             componente = {
-                'id_producto' : id_producto,
-                'id_componente' : id_componente,
-                'cantidad' : cantidad
+                'id_producto' : int(id_producto),
+                'id_componente' : int(id_componente),
+                'cantidad' : float(cantidad)
             }
             componentes_por_producto[id] = componente
 
@@ -471,7 +474,7 @@ class Stock:
         self.DB = DB
         self.CUR = self.DB.cursor()
 
-    def getAll(self, DB):
+    def getAll(self):
         self.CUR.execute('SELECT id, tipo_item, id_item, cantidad, movimiento FROM stock')
         query = self.CUR.fetchall()
         stock = {}
@@ -479,85 +482,79 @@ class Stock:
         for id, tipo_item, id_item, cantidad, movimiento in query:
             item = {
                 'tipo_item' : tipo_item,
-                'id_item' : id_item,
-                'cantidad' : cantidad,
+                'id_item' : int(id_item),
+                'cantidad' : float(cantidad),
                 'movimiento' : movimiento
             }
             stock[id] = item
 
         return stock
 
-class Fabricaciones:
-    def __init__(self, DB):
-        self.DB = DB
+    def set(self, id, cantidad):
+        self.CUR.execute('UPDATE stock SET cantidad = ?, movimiento = ? WHERE id = ?',
+                         (cantidad, Tiempo(), id))
+        self.DB.commit()
 
-    def Consultar(self):
-        consulta = '''\
-            SELECT
-                cab.fecha,
-                GROUP_CONCAT(
-                    det.id_producto || ':' ||
-                    det.cantidad || ',' ||
-                    det.precio_costo || ',' ||
-                    det.precio_venta
-                    , ';')
-            FROM fabricaciones_encabezado cab
-            JOIN fabricaciones_detalle det ON det.id_encabezado = cab.id
-            GROUP BY cab.fecha'''
+        return Mensajes['STOCK_EXITO_MODIFICAR']
 
-        fabricaciones = self.DB.execute(consulta).fetchall()
-        fabricacionesLista = {}
+    def add(self, tipo_item, id_item, cantidad):
+        cantidad_actual = self.CUR.execute('SELECT cantidad FROM stock WHERE tipo_item = ? AND id_item = ?',
+                                          (tipo_item, id_item)).fetchone()[0]
+        
+        self.CUR.execute('UPDATE stock SET cantidad = ?, movimiento = ? WHERE tipo_item = ? AND id_item = ?',
+                         (round(float(cantidad_actual) + float(cantidad), 2), Tiempo(), tipo_item, id_item))
+        self.DB.commit()
 
-        for fechas, productos in fabricaciones:
-            fecha = {}
-
-            for producto in productos.split(';'):
-                id_producto_str, valores_str = producto.split(':')
-                id_producto = int(id_producto_str)
-                valores = [float(valor) if '.' in valor else int(valor) for valor in valores_str.split(',')]
-                fecha[id_producto] = valores
-
-            fabricacionesLista[fechas] = fecha
-
-        return fabricacionesLista
+        return Mensajes['STOCK_EXITO_MODIFICAR']
         
 
-    def Consultar_Siguiente_ID(self):
+class Fabricacion:
+    def __init__(self, DB):
+        self.DB = DB
+        self.CUR = self.DB.cursor()
+
+    def getAll(self):
+        self.CUR.execute('''
+            SELECT
+                cab.id,
+                cab.fecha,
+                GROUP_CONCAT(
+                    det.id_producto || ',' ||
+                    det.cantidad || ',' ||
+                    det.costo_total
+                    , ';')
+            FROM fabricaciones_encabezado cab
+            JOIN fabricaciones_detalle det ON cab.id = det.id_encabezado
+            GROUP BY cab.fecha''')
+
+        query = self.CUR.fetchall()
+        fabricaciones = {}
+
+        for id, fecha, productos in query:
+            fabricacion = {
+                'fecha' : fecha,
+                'productos' : {}
+            }
+
+            for producto in productos.split(';'):
+                id_producto, cantidad, costo_total = producto.split(',')
+                producto_dict = {
+                    'cantidad' : float(cantidad),
+                    'costo_total' : float(costo_total)
+                }
+                fabricacion['productos'][int(id_producto)] = producto_dict
+            fabricaciones[int(id)] = fabricacion
+
+        return fabricaciones
+    
+    def getNext(self):
         try:
-            resultado = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "fabricaciones"').fetchone()[0]
+            id = self.DB.execute('SELECT seq + 1 FROM sqlite_sequence WHERE name = "fabricaciones_encabezado"').fetchone()[0]
 
         except TypeError:
             return 1
         
-        return resultado
-
-    def Agregar(self, fecha, productos, cantidades, costos, ventas):
-        if len(productos) != len(set(productos)):
-            return Mensajes['FABRICACION_ERROR_PRODUCTO_DUPLICADO']
-        
-        row = self.DB.execute('SELECT id FROM fabricaciones_encabezado WHERE fecha = ?', (fecha,)).fetchone()
-
-        if row:
-            id_encabezado = row[0]
-
-        else:
-            id_encabezado = self.DB.execute('INSERT INTO fabricaciones_encabezado (fecha) VALUES (?)', (fecha,)).lastrowid
-
-        for i in range(len(productos)):
-            self.DB.execute(f'INSERT INTO fabricaciones_detalle (id_encabezado, id_producto, cantidad, precio_costo, precio_venta) VALUES ({id_encabezado}, {productos[i]}, {cantidades[i]}, {costos[i]}, {ventas[i]})')
-        
-        self.DB.commit()
-        
-        return Mensajes['FABRICACION_EXITO_AGREGAR']
-
-    def Modificar(self, id, id_producto, cantidad, costo, precio_venta):
-        if not Validar_Cantidad(cantidad):
-            return Mensajes['FABRICACION_ERROR_CANTIDAD']
-        
-        self.DB.execute('UPDATE fabricaciones SET id_producto = ?, cantidad = ?, costo = ?, precio_venta = ? WHERE id = ?', (id_producto, cantidad, costo, precio_venta, id))
-        self.DB.commit()
-        
-        return Mensajes['FABRICACION_EXITO_MODIFICAR']
+        return id
 
 class Facturas:
     def __init__(self, DB):

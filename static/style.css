@@ -48,6 +48,9 @@ body {
     row-gap: 0.5rem;
     column-gap: 0.5rem;
 }
+body::-webkit-scrollbar {
+    display: none;
+}
 
 header {
     grid-area: header;
@@ -194,9 +197,12 @@ table {
     table td:focus-within input {
         color: var(--color-blanco);
     }
-    table input[type=text], table input[type=password], table input[type=number] {
+    table input[type=text], table input[type=password], table input[type=number], table input[type=datetime], table input[type=date] {
         background: none;
         border: none;
+    }
+    table input[type=date] {
+        text-align: center;
     }
     table input[type=button], table input[type=submit] {
         background: var(--color-gris);
@@ -215,6 +221,9 @@ table {
         background-color: var(--color-azul);
         color: var(--color-blanco);
     }
+table.fabricacion {
+    margin-bottom: 1.5rem;
+}
 
 #login {
     grid-template-areas:
@@ -259,3 +268,11 @@ table {
     #login input[type=submit]:active {
         border: var(--borde-sunken);
     }
+
+table input:invalid + span::after {
+  content: "✖";
+}
+
+table input:valid + span::after {
+  content: "✓";
+}

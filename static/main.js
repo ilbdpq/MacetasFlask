@@ -1,19 +1,41 @@
 function agregarFila() {
     const fila = document.querySelector('.agregarFila');
+    if (!fila) return;
+
     const nuevaFila = fila.cloneNode(true);
 
-    // Limpiar los valores de los inputs/selects en la nueva fila
-    nuevaFila.querySelectorAll('input, select').forEach(el => {
-        if (el.type === 'number' || el.type === 'text' || el.type === 'date') {
-            el.value = '';
-        }
-    });
+    limpiarCampos(nuevaFila);
+    prepararBotonEliminar(nuevaFila);
 
-    // Insertar la nueva fila antes del botón "Subir"
     const tabla = fila.closest('tbody');
-    const submitRow = tabla.querySelector('tr:last-child');
-    tabla.insertBefore(nuevaFila, submitRow);
+    const submitRow = tabla?.querySelector('tr:last-child');
+    if (tabla && submitRow) {
+        tabla.insertBefore(nuevaFila, submitRow);
+    }
 }
+
+function limpiarCampos(fila) {
+    fila.querySelectorAll('input[type="number"], input[type="text"], input[type="date"]')
+        .forEach(el => el.value = '');
+
+    fila.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0; // vuelve a la primera opción
+    });
+}
+
+function prepararBotonEliminar(fila) {
+    const boton = fila.querySelector('input[type="button"]');
+    if (boton) {
+        boton.value = '-';
+        boton.onclick = () => eliminarFila(fila);
+    }
+}
+
+function eliminarFila(fila) {
+    fila.remove();
+}
+
+
 
 function controlRueda(e, input, step) {
     e.preventDefault();

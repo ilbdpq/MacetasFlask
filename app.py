@@ -1,8 +1,9 @@
 import sqlite3
-from flask import Flask, render_template, url_for, redirect, session
+from flask import Flask, render_template, url_for, redirect, session, send_from_directory
 from flask import request
 from flask import g
 import datetime
+import os
 
 import funciones as fun
 
@@ -40,8 +41,12 @@ def Inyectar_Datos():
     Producto = fun.Producto(DB)
     Componente = fun.Componente(DB)
     Componente_Por_Producto = fun.Componente_Por_Producto(DB)
+    Stock = fun.Stock(DB)
+    Fabricacion = fun.Fabricacion(DB)
     
     return dict(
+        titulo = 'Macetas S.A.',
+        
         roles = Usuario.getRoles(),
         usuarios = Usuario.getAll(),
         usuario_siguiente = Usuario.getNext(),
@@ -55,7 +60,13 @@ def Inyectar_Datos():
         componente_siguiente = Componente.getNext(),
         componentes_lista = Componente.getList(),
         componentes_por_producto_habilitados = Componente_Por_Producto.getEnabled(),
-        componentes_por_producto_siguiente = Componente_Por_Producto.getNext(),
+        componente_por_producto_siguiente = Componente_Por_Producto.getNext(),
+
+        stock = Stock.getAll(),
+
+        fabricaciones = Fabricacion.getAll(),
+        fabricacion_siguiente = Fabricacion.getNext(),
+        fechaHoy = fun.Fecha(),
     )
 
 '''
@@ -281,43 +292,53 @@ def Agregar_Componente_Por_Producto():
 Stock
 '''
 @APP.route('/stock/', methods=['GET'])
-def Stock_Consultar():
-    return render_template('/stock.html')
+def Template_Stock():
+    try:
+        session['mensajes']
 
-@APP.route('/stock/modificar', methods=['POST'])
-def Stock_Modificar():
-    id = request.form['id_modificar']
-    cantidad = request.form['cantidad_modificar']
+    except KeyError:
+        session['mensajes'] = []
+        
+    return render_template('/stock.html', mensajes=session['mensajes'])
+
+@APP.route('/stock/modificar/', methods=['POST'])
+def Modificar_Stock():
+    id = request.form['id']
+    cantidad = request.form['cantidad']
 
     Stock = fun.Stock(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Stock.set(id, cantidad)]
 
-    return render_template('/stock.html', mensajes=[Stock.Modificar(id, cantidad)])
+    return redirect(url_for('Template_Stock'))
+
+@APP.route('/stock/agregar/', methods=['POST'])
+def Agregar_Stock():
+    item = request.form['item']
+    cantidad = request.form['cantidad']
+
+    tipo_item, id_item = item.split(',')
+
+    Stock = fun.Stock(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Stock.add(tipo_item, id_item, cantidad)]
+
+    return redirect(url_for('Template_Stock'))
 
 '''
 Fabricaciones
 '''
 @APP.route('/fabricaciones/', methods=['GET'])
-def Fabricaciones_Consultar():
-    return render_template('/fabricaciones.html')
+def Template_Fabricaciones():
+    try:
+        session['mensajes']
 
-@APP.route('/fabricaciones/agregar', methods=['POST'])
-def Fabricaciones_Agregar():
-    if request.method == 'POST':
-        fecha = request.form['agregar_fecha']
-        productos = request.form.getlist('agregar_producto')
-        cantidades = request.form.getlist('agregar_cantidad')
-        costos = request.form.getlist('agregar_costo')
-        ventas = request.form.getlist('agregar_venta')
+    except KeyError:
+        session['mensajes'] = []
+        
+    return render_template('/fabricaciones.html', mensajes=session['mensajes'])
 
-        Fabricaciones = fun.Fabricaciones(Get_DB())
-        Stock = fun.Stock(Get_DB())
-
-        # BUG: El Stock se agrega aunque falle la Fabricación
-        # TODO: El Stock de los Componentes debería disminuir
-
-        return render_template('/fabricaciones.html', mensajes=[Fabricaciones.Agregar(fecha, productos, cantidades, costos, ventas), Stock.Agregar_Fabricacion(productos, cantidades)])
-
-    return render_template('/fabricaciones.html')
+@APP.route('/fabricaciones/agregar/', methods=['POST'])
+def Agregar_Fabricacion():
+    return redirect(url_for('Template_Fabricaciones'))
 
 '''
 FACTURAS
@@ -344,6 +365,10 @@ def Facturas_Agregar():
         return render_template('/facturas.html', mensajes=[Facturas.Agregar(fecha, cliente, productos, cantidades, precios), Stock.Facturar(productos, cantidades)])
 
     return render_template('/facturas.html')
+
+@APP.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(APP.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 with APP.app_context():
     Init_DB()

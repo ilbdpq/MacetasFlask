@@ -1,73 +1,115 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Practico</title>
-    <link rel="stylesheet" href="https://unpkg.com/98.css">
-    <link rel='stylesheet' href='{{url_for('static', filename='styles.css')}}'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 
 <body>
-    <div class="window">
-        {% include 'header.html' %}
+    {% include 'header.html' %}
+    {% include 'aside.html' %}
 
-        <div class="window-body" id="container">
-            <div id="aside">
-                {% include 'nav.html' %}
-                {% include 'mensajes.html' %}
-            </div>
-
-            <div id="main">
-                <legend>Stock</legend>
-                <div class="sunken-panel">
-                    <table class="interactive">
-                        <thead>
-                            <th style="width: 5%;" class="primerColumna">ID</th>
-                            <th style="width: 10%;">Tipo</th>
-                            <th style="width: 50%;">Item</th>
-                            <th style="width: 20%;">Cantidad</th>
-                            <th style="width: 5%;" class="ultimaColumna">Acción</th>
-                        </thead>
-
-                        {% if stockLista %}
-                            {% for stock in stockLista %}
-                                <tr>
-                                    <form action="/stock/modificar" method="post">
-                                        <td class="primerColumna">
-                                            <input type="text" name="id_modificar" value="{{stock[0]}}" readonly required>
-                                        </td>
-                                        <td class="columnaReadonly">
-                                            <input type="text" name="tipo_modificar" value="{{stock[1]}}" readonly required>
-                                        </td>
-                                        <td class="columnaReadonly">
-                                            {% if stock[1] == 'Producto' %}
-                                                <input type="text" name="item_modificar" value="{{ productosFormateados.get(stock[2]) }}" readonly required>
-                                            {% elif stock[1] == 'Componente' %}
-                                                <input type="text" name="item_modificar" value="{{ componentesFormateados.get(stock[2]) }}" readonly required>
+    <main>
+        <legend>Stock</legend>
+        <table>
+            <thead>
+                <tr>
+                    <th class="id">ID</th>
+                    <th>Item</th>
+                    <th>Cantidad</th>
+                    <th>Último movimiento</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if stock %}
+                    {% for id, item in stock.items() %}
+                        <tr>
+                            <form action="{{ url_for('Modificar_Stock') }}" method="post">
+                                <th class="id">
+                                    <input type="text" name="id" value="{{ id }}" readonly>
+                                </th>
+                                <td>
+                                    {% if item['tipo_item'] == 'Producto' %}
+                                        {% for id_producto, producto in productos_lista.items() %}
+                                            {% if item['id_item'] == id_producto %}                                                
+                                                <input type="text" value="{{ producto }}" readonly>
+                                                <input type="hidden" name="id_item" value="{{ id_producto }}" readonly>
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <div class="scrollColumna">
-                                                <button type="button" onclick="this.nextElementSibling.stepDown(); this.nextElementSibling.dispatchEvent(new Event('input'));">-</button>
-                                                <input type="number" step="1" min="0" onmousewheel name="cantidad_modificar" value="{{stock[3]}}" required>
-                                                <button type="button" onclick="this.previousElementSibling.stepUp(); this.previousElementSibling.dispatchEvent(new Event('input'));">+</button>
-                                            </div>
-                                        </td>
-                                        <td class="ultimaColumna">
-                                            <div>
-                                                <input type="submit" value="Guardar">
-                                            </div>
-                                        </td>
-                                    </form>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+                                        {% endfor %}
+                                    {% elif item['tipo_item'] == 'Componente' %}
+                                        {% for id_componente, componente in componentes_lista.items() %}
+                                            {% if item['id_item'] == id_componente %}                                                
+                                                <input type="text" value="{{ componente }}" readonly>
+                                                <input type="hidden" name="id_item" value="{{ id_componente }}" readonly>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <input type="number" name="cantidad" value="{{ item['cantidad'] }}" required min="0" step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
+                                </td>
+                                <td>
+                                    <input type="datetime" name="movimiento" value="{{ item['movimiento'] }}" readonly>
+                                </td>
+                                <th class="columnaAcciones">
+                                    <span>
+                                        <input type="submit" value="Modificar">
+                                    </span>
+                                </th>
+                            </form>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                <tr>
+                    <form action="{{ url_for('Agregar_Stock') }}" method="post">
+                        <th>
+                            +
+                        </th>
+                        <td>
+                            <select name="item" required>
+                                <optgroup label="Productos">
+                                    {% for id_producto, producto in productos_lista.items() %}
+                                        <option value="Producto,{{ id_producto }}">{{ producto }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Componentes">
+                                    {% for id_componente, componente in componentes_lista.items() %}
+                                        <option value="Componente,{{ id_componente }}">{{ componente }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="cantidad" required step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
+                        </td>
+                        <td>
+                            <input type="text" id="current-datetime" readonly>
+                        </td>
+                        <th class="columnaAcciones">
+                            <span>
+                                <input type="submit" value="Agregar">
+                            </span>
+                        </th>
+                    </form>
+                </tr>
+            </tbody>
+        </table>
+    </main>
 </body>
-
+<script>
+    function updateDateTime() {
+    const now = new Date();
+    const pad = n => n.toString().padStart(2, '0');
+    const formatted = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    document.getElementById('current-datetime').value = formatted;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
 </html>

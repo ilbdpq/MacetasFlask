@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{ titulo }}</title>
 
     <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
 
 <body>
@@ -31,19 +32,19 @@
                         <tr>
                             <form action="{{ url_for('Modificar_Usuario') }}" method="post">
                                 <th class="id">
-                                    <input type="text" name="id" value="{{ id }}">
+                                    <input type="text" name="id" value="{{ id }}" readonly>
                                 </th>
                                 <td>
-                                    <input type="text" name="username" value="{{ usuario['username'] }}">
+                                    <input type="text" name="username" value="{{ usuario['username'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="password" name="password" value="{{ usuario['password'] }}">
+                                    <input type="password" name="password" value="{{ usuario['password'] }}" required>
                                 </td>
                                 <td>
-                                    <input type="text" name="nombres" value="{{ usuario['nombres'] }}">
+                                    <input type="text" name="nombres" value="{{ usuario['nombres'] }}" required>
                                 </td>
                                 <td>
-                                    <select name="rol">
+                                    <select name="rol" required>
                                         {% for rol in roles %}
                                             {% if rol == usuario['rol'] %}
                                                 <option selected value="{{ rol }}">{{ rol }}</option>
@@ -69,16 +70,16 @@
                             {{ usuario_siguiente }}
                         </th>
                         <td>
-                            <input type="text" name="username">
+                            <input type="text" name="username" required>
                         </td>
                         <td>
-                            <input type="password" name="password">
+                            <input type="password" name="password" required>
                         </td>
                         <td>
-                            <input type="text" name="nombres">
+                            <input type="text" name="nombres" required>
                         </td>
                         <td>
-                            <select name="rol">
+                            <select name="rol" required>
                                 {% for rol in roles %}
                                     <option value="{{ rol }}">{{ rol }}</option>
                                 {% endfor %}
