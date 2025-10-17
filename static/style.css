@@ -14,6 +14,7 @@ html {
     --color-blanco: #EEE;
     --borde-raised: 2px outset var(--color-blanco);
     --borde-sunken: 2px inset var(--color-blanco);
+    --borde-sunken-inner: 2px inset var(--color-grisclaro);
     --borde-grooved: 4px groove var(--color-blanco);
     --borde-ridged: 4px ridge var(--color-blanco);
     --fuente-grande: 1.5rem;
@@ -170,7 +171,7 @@ table {
         text-align: center;
     }
     table td {
-        border: var(--borde-sunken);
+        border: var(--borde-sunken-inner);
         background-color: var(--color-blanco);
         height: 1.5rem;
         padding: 0 0.25rem;
@@ -269,10 +270,24 @@ table.fabricacion {
         border: var(--borde-sunken);
     }
 
-table input:invalid + span::after {
-  content: "✖";
+.informes {
+    display: flex;
+    flex-direction: row;
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
 }
-
-table input:valid + span::after {
-  content: "✓";
-}
+    .informe {
+        background-color: var(--color-grisclaro);
+        border: var(--borde-raised);
+        display: flex;
+        flex-direction: column;
+        width: max-content;
+        padding: 0.5rem;
+        row-gap: 0.25rem;
+    }
+        .informe div {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            column-gap: 1rem;
+        }

@@ -43,9 +43,14 @@ def Inyectar_Datos():
     Componente_Por_Producto = fun.Componente_Por_Producto(DB)
     Stock = fun.Stock(DB)
     Fabricacion = fun.Fabricacion(DB)
+    Factura = fun.Factura(DB)
+    Informe = fun.Informe(DB)
     
     return dict(
         titulo = 'Macetas S.A.',
+        fechaHoy = fun.FechaHoy(),
+        fechaAnterior = fun.FechaAnterior(),
+        fechaSiguiente = fun.FechaSiguiente(),
         
         roles = Usuario.getRoles(),
         usuarios = Usuario.getAll(),
@@ -66,7 +71,13 @@ def Inyectar_Datos():
 
         fabricaciones = Fabricacion.getAll(),
         fabricacion_siguiente = Fabricacion.getNext(),
-        fechaHoy = fun.Fecha(),
+
+        facturas = Factura.getAll(),
+        factura_siguiente = Factura.getNext(),
+
+        informe_fabricaciones_producto = Informe.Fabricaciones_Producto(),
+        informe_ventas_producto = Informe.Ventas_Producto(),
+        informe_registros = Informe.Registros(),
     )
 
 '''
@@ -338,33 +349,44 @@ def Template_Fabricaciones():
 
 @APP.route('/fabricaciones/agregar/', methods=['POST'])
 def Agregar_Fabricacion():
+    fecha = request.form['fecha']
+    id_productos = request.form.getlist('id_producto')
+    cantidades = request.form.getlist('cantidad')
+    
+    Fabricacion = fun.Fabricacion(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Fabricacion.add(fecha, id_productos, cantidades)]
+    
     return redirect(url_for('Template_Fabricaciones'))
 
 '''
-FACTURAS
+Facturas
 '''
 
 @APP.route('/facturas/', methods=['GET'])
-def Facturas_Consultar():
-    return render_template('/facturas_2.html')
+def Template_Facturas():
+    try:
+        session['mensajes']
 
-@APP.route('/facturas/agregar', methods=['POST'])
-def Facturas_Agregar():
-    if request.method == 'POST':
-        fecha = request.form['agregar_fecha']
-        cliente = request.form['agregar_cliente']
-        productos = request.form.getlist('agregar_producto')
-        cantidades = request.form.getlist('agregar_cantidad')
-        precios = request.form.getlist('agregar_precio')
+    except KeyError:
+        session['mensajes'] = []
+        
+    return render_template('/facturas.html', mensajes=session['mensajes'])
 
-        Facturas = fun.Facturas(Get_DB())
-        Stock = fun.Stock(Get_DB())
+@APP.route('/facturas/agregar/', methods=['POST'])
+def Agregar_Factura():
+    fecha = request.form['fecha']
+    cliente = request.form['cliente']
+    id_productos = request.form.getlist('id_producto')
+    cantidades = request.form.getlist('cantidad')
+    
+    Factura = fun.Factura(Get_DB())
+    session['mensajes'] = [fun.Tiempo(), Factura.add(fecha, cliente, id_productos, cantidades)]
+    
+    return redirect(url_for('Template_Facturas'))
 
-        # TODO: El Stock debería disminuir
-
-        return render_template('/facturas.html', mensajes=[Facturas.Agregar(fecha, cliente, productos, cantidades, precios), Stock.Facturar(productos, cantidades)])
-
-    return render_template('/facturas.html')
+@APP.route('/informes/general/', methods=['GET'])
+def Template_Informes_General():
+    return render_template('/informes_general.html')
 
 @APP.route('/favicon.ico')
 def favicon():

@@ -8,16 +8,13 @@
             <a href="{{ url_for('Template_Componentes') }}">Componentes</a>
             <a href="{{ url_for('Template_Stock') }}">Stock</a>
             <a href="{{ url_for('Template_Fabricaciones') }}">Fabricaciones</a>
-            <a href="/facturas">Facturas</a>
+            <a href="{{ url_for('Template_Facturas') }}">Facturas</a>
         </details>
 
         <details open>
             <summary>Informes</summary>
-            <a href="">Productos</a>
-            <a href="">Componentes</a>
-            <a href="">Stock</a>
-            <a href="">Fabricaciones</a>
-            <a href="">Facturas</a>
+            <a href="{{ url_for('Template_Informes_General') }}">General</a>
+            <a href="">Sitio</a>
         </details>
     </nav>
 

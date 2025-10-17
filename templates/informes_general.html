@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+
+    <link rel='stylesheet' href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    
+</head>
+
+<body>
+    {% include 'header.html' %}
+    {% include 'aside.html' %}
+
+    <main>
+        <legend>Informes</legend>
+
+        <div class="informes">
+            <div class="informe">
+                <h3>Registros</h3>
+                {% if informe_registros %}
+                    {% for registro, cantidad in informe_registros.items() %}
+                        <div>
+                            <span>{{ registro }}</span>
+                            <span>{{ cantidad }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="informe">
+                <h3>Productos fabricados</h3>
+                {% if informe_fabricaciones_producto %}
+                    {% for id_producto, cantidad_fabricada in informe_fabricaciones_producto %}
+                        <div>
+                            <span>
+                                {{ productos_lista.get(id_producto)}}
+                            </span>
+                            <span>
+                                {{ cantidad_fabricada }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+    
+            <div class="informe">
+                <h3>Productos vendidos</h3>
+                {% if informe_ventas_producto %}
+                    {% for id_producto, cantidad_vendida in informe_ventas_producto %}
+                        <div>
+                            <span>
+                                {{ productos_lista.get(id_producto)}}
+                            </span>
+                            <span>
+                                {{ cantidad_vendida }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>

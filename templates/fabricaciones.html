@@ -51,15 +51,14 @@
             <table class="nuevaFabricacion">
                 <tr>
                     <th style="width: 8rem;">
-                        <input type="date" name="fecha" value="{{ fechaHoy }}" required style="width: 8rem;">
+                        <input type="date" name="fecha" value="{{ fechaHoy }}" min="{{ fechaAnterior }}" max="{{ fechaSiguiente }}" required style="width: 8rem;">
                     </th>
-                    <th colspan="3">Productos</th>
+                    <th colspan="2">Productos</th>
                 </tr>
                 <tr>
                     <th class="id">#{{ fabricacion_siguiente }}</th>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Costo Total</th>
                 </tr>
                 <tr class="agregarFila">
                     <th class="columnaAcciones" rowspan="1">
@@ -68,21 +67,18 @@
                         </span>
                     </th>
                     <td>
-                        <select name="producto" required>
+                        <select name="id_producto" required>
                             {% for id_producto, producto in productos_lista.items() %}
-                                <option value="Producto,{{ id_producto }}">{{ producto }}</option>
+                                <option value="{{ id_producto }}">{{ producto }}</option>
                             {% endfor %}
                         </select>
                     </td>
                     <td>
-                        <input type="number" name="cantidad" required step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
-                    </td>
-                    <td>
-                        <input type="number" name="costo_total" required step="0.1" onmousewheel="controlRueda(event, this, 0.1)">
+                        <input type="number" name="cantidad" required step="1" min="0" onmousewheel="controlRueda(event, this, 1)">
                     </td>
                 </tr>
                 <tr class="columnaAcciones">
-                    <th class="columnaAcciones" colspan="4">
+                    <th class="columnaAcciones" colspan="3">
                         <span>
                             <input type="submit" value="Agregar">
                         </span>

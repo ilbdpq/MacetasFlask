@@ -207,6 +207,7 @@ INSERT INTO stock (id_item, tipo_item, cantidad, movimiento) VALUES
 INSERT INTO fabricaciones_encabezado (fecha) VALUES
     ('2025-09-29'),
     ('2025-09-30'),
+    ('2025-10-01'),
     ('2025-10-01');
 
 INSERT INTO fabricaciones_detalle (id_encabezado, id_producto, cantidad, costo_total) VALUES
@@ -216,4 +217,20 @@ INSERT INTO fabricaciones_detalle (id_encabezado, id_producto, cantidad, costo_t
     (2, 1, 10, 100),
     (2, 2, 15, 150),
     (3, 1, 10, 100),
-    (3, 3, 20, 200);
+    (3, 3, 20, 200),
+    (4, 4, 10, 150);
+
+-- Insertar datos en FACTURAS
+INSERT INTO facturas_encabezado (fecha, cliente) VALUES
+    ('2025-09-29', 'Pedro Pérez'),
+    ('2025-09-30', 'Fernando Fernández');
+
+INSERT INTO facturas_detalle (id_encabezado, id_producto, cantidad, precio_total) VALUES
+    (1, 1, 30, 300),
+    (1, 2, 10, 100),
+    (1, 3, 20, 200),
+    (1, 4, 15, 150),
+    (2, 1, 20, 200),
+    (2, 2, 30, 300),
+    (2, 3, 30, 300),
+    (2, 4, 40, 400);
